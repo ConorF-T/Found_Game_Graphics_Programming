@@ -199,10 +199,10 @@ void Game::CreateGeometry()
 	// Vertices for the rectangle
 	Vertex rectangleVertices[] =
 	{
-		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), red },
-		{ XMFLOAT3(+0.5f, -0.5f, +0.0f), red },
-		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), blue },
-		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), blue },
+		{ XMFLOAT3(-0.7f, +0.7f, +0.0f), red },
+		{ XMFLOAT3(-0.3f, +0.7f, +0.0f), blue },
+		{ XMFLOAT3(-0.7f, +0.3f, +0.0f), red },
+		{ XMFLOAT3(-0.3f, +0.0f, +0.0f), green },
 	};
 
 	//Indices for the rectangle
