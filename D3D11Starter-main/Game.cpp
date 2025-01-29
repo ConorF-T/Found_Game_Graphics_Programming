@@ -215,15 +215,15 @@ void Game::CreateGeometry()
 	Vertex polyVertices[] =
 	{
 		{ XMFLOAT3(+0.3f, +0.5f, +0.0f), white },
-		{ XMFLOAT3(+0.5f, +0.7f, +0.0f), black },
-		{ XMFLOAT3(+0.7f, +0.6f, +0.0f), black },
-		{ XMFLOAT3(+0.4f, +0.5f, +0.0f), white },
-		{ XMFLOAT3(+0.7f, +0.4f, +0.0f), black },
-		{ XMFLOAT3(+0.5f, +0.3f, +0.0f), black },
+		{ XMFLOAT3(+0.4f, +0.7f, +0.0f), black },
+		{ XMFLOAT3(+0.6f, +0.6f, +0.0f), black },
+		{ XMFLOAT3(+0.5f, +0.5f, +0.0f), white },
+		{ XMFLOAT3(+0.6f, +0.4f, +0.0f), black },
+		{ XMFLOAT3(+0.4f, +0.3f, +0.0f), black },
 	};
 
 	//Indices for the rectangle
-	unsigned int polyIndices[] = { 0, 1, 2, 3 };
+	unsigned int polyIndices[] = { 0, 1, 2, 3, 4, 5 };
 
 	// Use Mesh class to create meshes
 	// Initialize Meshes
@@ -271,7 +271,7 @@ void Game::Update(float deltaTime, float totalTime)
 	
 
 	// Begin Custom Window
-	ImGui::Begin("Conor's First Window"); // Everything after is part of the window
+	ImGui::Begin("Inspector"); // Everything after is part of the window
 
 	// Window Size Text
 	ImGui::Text("Window Dimensions: %dx%d", Window::Width(), Window::Height());
