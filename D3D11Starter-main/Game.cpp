@@ -4,6 +4,8 @@
 #include "Input.h"
 #include "PathHelpers.h"
 #include "Window.h"
+#include "Mesh.h"
+#include <memory>
 
 #include <DirectXMath.h>
 
@@ -19,6 +21,10 @@
 
 // For the DirectX Math library
 using namespace DirectX;
+
+// Meshes
+std::shared_ptr<Mesh> mainTriangle;
+std::shared_ptr<Mesh> rectangle;
 
 // --------------------------------------------------------
 // Called once per program, after the window and graphics API
@@ -190,6 +196,12 @@ void Game::CreateGeometry()
 	unsigned int indices[] = { 0, 1, 2 };
 
 
+	// Use Mesh class to create meshes
+	// Initialize Meshes
+	mainTriangle = std::make_shared<Mesh>(vertices, 3, indices, 3);
+	//rectangle = std::make_shared<Mesh>();
+
+	/*
 	// Create a VERTEX BUFFER
 	// - This holds the vertex data of triangles for a single object
 	// - This buffer is created on the GPU, which is where the data needs to
@@ -242,6 +254,7 @@ void Game::CreateGeometry()
 		// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
 		Graphics::Device->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
 	}
+	*/
 }
 
 
@@ -331,6 +344,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		Graphics::Context->ClearDepthStencilView(Graphics::DepthBufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
+
 	// DRAW geometry
 	// - These steps are generally repeated for EACH object you draw
 	// - Other Direct3D calls will also be necessary to do more complex things
@@ -342,8 +356,8 @@ void Game::Draw(float deltaTime, float totalTime)
 		//     when drawing different geometry, so it's here as an example
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
-		Graphics::Context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-		Graphics::Context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		Graphics::Context->IASetVertexBuffers(0, 1, mainTriangle->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		Graphics::Context->IASetIndexBuffer(mainTriangle->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Tell Direct3D to draw
 		//  - Begins the rendering pipeline on the GPU
@@ -352,7 +366,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
 		//     vertices in the currently set VERTEX BUFFER
 		Graphics::Context->DrawIndexed(
-			3,     // The number of indices to use (we could draw a subset if we wanted)
+			mainTriangle->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
 			0,     // Offset to the first index we want to use
 			0);    // Offset to add to each index when looking up vertices
 	}

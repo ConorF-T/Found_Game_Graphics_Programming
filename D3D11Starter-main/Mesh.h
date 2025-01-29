@@ -2,21 +2,24 @@
 #include <d3d11.h>
 #include <wrl/client.h>
 
+#include "Graphics.h"
+#include "Vertex.h"
+
 class Mesh
 {
 public:
 	// Basic OOP Setup
-	Mesh() = default;
+	Mesh(Vertex vertices[], int verticesSize, unsigned int indices[], int indicesSize);
 	~Mesh();
 	Mesh(const Mesh&) = delete;
 	Mesh& operator = (const Mesh&) = delete;
 
 	// Public Methods
-	void GetVertexBuffer();
-	void GetIndexBuffer();
+	Microsoft::WRL::ComPtr<ID3D11Buffer> GetVertexBuffer();
+	Microsoft::WRL::ComPtr<ID3D11Buffer> GetIndexBuffer();
 	int GetIndexCount();
 	int GetVertexCount();
-	void Draw(float deltaTime, float totalTime);
+	void Draw();
 
 private:
 	// Buffers for geometric data
@@ -24,8 +27,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 
 	// Integers for keeping track of vertext and index buffer numbers
-	int indexBufferIndices;
-	int vertexBufferVertices;
+	int numVertices;
+	int numIndices;
 
 };
 
