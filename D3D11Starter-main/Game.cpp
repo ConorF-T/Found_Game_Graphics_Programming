@@ -25,6 +25,7 @@ using namespace DirectX;
 // Meshes
 std::shared_ptr<Mesh> mainTriangle;
 std::shared_ptr<Mesh> rectangle;
+std::shared_ptr<Mesh> polygon;
 
 // --------------------------------------------------------
 // Called once per program, after the window and graphics API
@@ -168,6 +169,8 @@ void Game::CreateGeometry()
 	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	XMFLOAT4 white = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	XMFLOAT4 black = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Set up the vertices of the triangle we would like to draw
 	// - We're going to copy this array, exactly as it exists in CPU memory
@@ -201,17 +204,32 @@ void Game::CreateGeometry()
 	{
 		{ XMFLOAT3(-0.7f, +0.7f, +0.0f), red },
 		{ XMFLOAT3(-0.3f, +0.7f, +0.0f), blue },
-		{ XMFLOAT3(-0.7f, +0.3f, +0.0f), red },
 		{ XMFLOAT3(-0.3f, +0.0f, +0.0f), green },
+		{ XMFLOAT3(-0.7f, +0.3f, +0.0f), red },
+	};
+
+	//Indices for the polygon
+	unsigned int rectangleIndices[] = { 0, 1, 2, 3 };
+
+	// Vertices for the polygon
+	Vertex polyVertices[] =
+	{
+		{ XMFLOAT3(+0.3f, +0.5f, +0.0f), white },
+		{ XMFLOAT3(+0.5f, +0.7f, +0.0f), black },
+		{ XMFLOAT3(+0.7f, +0.6f, +0.0f), black },
+		{ XMFLOAT3(+0.4f, +0.5f, +0.0f), white },
+		{ XMFLOAT3(+0.7f, +0.4f, +0.0f), black },
+		{ XMFLOAT3(+0.5f, +0.3f, +0.0f), black },
 	};
 
 	//Indices for the rectangle
-	unsigned int rectangleIndices[] = { 0, 1, 2, 3 };
+	unsigned int polyIndices[] = { 0, 1, 2, 3 };
 
 	// Use Mesh class to create meshes
 	// Initialize Meshes
 	mainTriangle = std::make_shared<Mesh>(triangleVertices, 3, triangleIndices, 3);
 	rectangle = std::make_shared<Mesh>(rectangleVertices, 4, rectangleIndices, 4);
+	polygon = std::make_shared<Mesh>(polyVertices, 6, polyIndices, 6);
 
 }
 
@@ -342,6 +360,23 @@ void Game::Draw(float deltaTime, float totalTime)
 
 		Graphics::Context->DrawIndexed(
 			rectangle->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+			0,     // Offset to the first index we want to use
+			0);    // Offset to add to each index when looking up vertices
+	}
+
+	ImGui::Render(); // Turns this frame’s UI into renderable triangles
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // Draws it to the screen
+
+	// DRAW Polygon
+	{
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		Graphics::Context->IASetVertexBuffers(0, 1, polygon->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		Graphics::Context->IASetIndexBuffer(polygon->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+
+
+		Graphics::Context->DrawIndexed(
+			polygon->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
 			0,     // Offset to the first index we want to use
 			0);    // Offset to add to each index when looking up vertices
 	}
