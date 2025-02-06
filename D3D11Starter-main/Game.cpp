@@ -223,13 +223,13 @@ void Game::CreateGeometry()
 	};
 
 	//Indices for the rectangle
-	unsigned int polyIndices[] = { 0, 1, 2, 3, 4, 5 };
+	unsigned int polyIndices[] = { 0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3 };
 
 	// Use Mesh class to create meshes
 	// Initialize Meshes
 	mainTriangle = std::make_shared<Mesh>(triangleVertices, 3, triangleIndices, 3);
 	rectangle = std::make_shared<Mesh>(rectangleVertices, 4, rectangleIndices, 6);
-	polygon = std::make_shared<Mesh>(polyVertices, 6, polyIndices, 6);
+	polygon = std::make_shared<Mesh>(polyVertices, 6, polyIndices, 12);
 
 }
 
