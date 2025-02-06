@@ -204,12 +204,12 @@ void Game::CreateGeometry()
 	{
 		{ XMFLOAT3(-0.7f, +0.7f, +0.0f), red },
 		{ XMFLOAT3(-0.3f, +0.7f, +0.0f), blue },
-		{ XMFLOAT3(-0.3f, +0.0f, +0.0f), green },
+		{ XMFLOAT3(-0.3f, +0.3f, +0.0f), blue },
 		{ XMFLOAT3(-0.7f, +0.3f, +0.0f), red },
 	};
 
 	//Indices for the polygon
-	unsigned int rectangleIndices[] = { 0, 1, 2, 3 };
+	unsigned int rectangleIndices[] = { 0, 1, 2, 0, 2, 3 };
 
 	// Vertices for the polygon
 	Vertex polyVertices[] =
@@ -228,7 +228,7 @@ void Game::CreateGeometry()
 	// Use Mesh class to create meshes
 	// Initialize Meshes
 	mainTriangle = std::make_shared<Mesh>(triangleVertices, 3, triangleIndices, 3);
-	rectangle = std::make_shared<Mesh>(rectangleVertices, 4, rectangleIndices, 4);
+	rectangle = std::make_shared<Mesh>(rectangleVertices, 4, rectangleIndices, 6);
 	polygon = std::make_shared<Mesh>(polyVertices, 6, polyIndices, 6);
 
 }
