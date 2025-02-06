@@ -6,6 +6,7 @@
 #include "Window.h"
 #include "Mesh.h"
 #include <memory>
+#include "BufferStruct.h"
 
 #include <DirectXMath.h>
 
@@ -70,6 +71,27 @@ void Game::Initialize()
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsLight();
 	//ImGui::StyleColorsClassic();
+
+	// Constant Buffer
+	
+	// Calculate the next multiple of 16 (instead of hardcoding it)
+	unsigned int size = sizeof(BufferStruct);
+	size = (size + 15) / 16 * 16;
+
+	// Describe the constant buffer
+	D3D11_BUFFER_DESC cbDesc = {}; // 
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.ByteWidth = size; // Must be a multiple of 16
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+
+	Graphics::Device->CreateBuffer(&cbDesc, 0, constBuffer.GetAddressOf());
+
+	// Bind the Constant Buffer to rendering pipeline
+	Graphics::Context->VSSetConstantBuffers(
+		0, // Which slot (register) to bind the buffer to?
+		1, // How many are we setting right now?
+		vsConstantBuffer.GetAddressOf()); // Array of buffers (or address of just one)
 }
 
 
@@ -319,6 +341,17 @@ void Game::Draw(float deltaTime, float totalTime)
 		Graphics::Context->ClearRenderTargetView(Graphics::BackBufferRTV.Get(),	color);
 		Graphics::Context->ClearDepthStencilView(Graphics::DepthBufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
+
+	// Constant Buffer Business
+	BufferStruct vsData;
+	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 0.5f, 1.0f);
+	vsData.offset = XMFLOAT3(0.25f, 0.0f, 0.0f);
+
+	// Mapping and unmapping the buffer
+	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+	Graphics::Context->Map(vsConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+	Graphics::Context->Unmap(vsConstantBuffer.Get(), 0);
 
 	// Draw triangle mesh
 	mainTriangle->Draw();
