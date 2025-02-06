@@ -81,3 +81,16 @@ int Mesh::GetIndexCount()
 {
 	return numIndices;
 }
+
+void Mesh::Draw()
+{
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	Graphics::Context->IASetVertexBuffers(0, 1, this->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+	Graphics::Context->IASetIndexBuffer(this->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+
+	Graphics::Context->DrawIndexed(
+		this->GetIndexCount(),
+		0,
+		0);
+}

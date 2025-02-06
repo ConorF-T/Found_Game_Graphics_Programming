@@ -320,66 +320,20 @@ void Game::Draw(float deltaTime, float totalTime)
 		Graphics::Context->ClearDepthStencilView(Graphics::DepthBufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
+	// Draw triangle mesh
+	mainTriangle->Draw();
+	
+	ImGui::Render(); // Turns this frame’s UI into renderable triangles
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // Draws it to the screen
 
-	// DRAW geometry
-	// - These steps are generally repeated for EACH object you draw
-	// - Other Direct3D calls will also be necessary to do more complex things
-	{
-		// Set buffers in the input assembler (IA) stage
-		//  - Do this ONCE PER OBJECT, since each object may have different geometry
-		//  - For this demo, this step *could* simply be done once during Init()
-		//  - However, this needs to be done between EACH DrawIndexed() call
-		//     when drawing different geometry, so it's here as an example
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		Graphics::Context->IASetVertexBuffers(0, 1, mainTriangle->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-		Graphics::Context->IASetIndexBuffer(mainTriangle->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		// Tell Direct3D to draw
-		//  - Begins the rendering pipeline on the GPU
-		//  - Do this ONCE PER OBJECT you intend to draw
-		//  - This will use all currently set Direct3D resources (shaders, buffers, etc)
-		//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
-		//     vertices in the currently set VERTEX BUFFER
-		Graphics::Context->DrawIndexed(
-			mainTriangle->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-			0,     // Offset to the first index we want to use
-			0);    // Offset to add to each index when looking up vertices
-	}
+	// DRAW Rectangle mesh
+	rectangle->Draw();
 
 	ImGui::Render(); // Turns this frame’s UI into renderable triangles
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // Draws it to the screen
 
-	// DRAW Rectangle
-	{
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		Graphics::Context->IASetVertexBuffers(0, 1, rectangle->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-		Graphics::Context->IASetIndexBuffer(rectangle->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-
-
-		Graphics::Context->DrawIndexed(
-			rectangle->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-			0,     // Offset to the first index we want to use
-			0);    // Offset to add to each index when looking up vertices
-	}
-
-	ImGui::Render(); // Turns this frame’s UI into renderable triangles
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // Draws it to the screen
-
-	// DRAW Polygon
-	{
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		Graphics::Context->IASetVertexBuffers(0, 1, polygon->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-		Graphics::Context->IASetIndexBuffer(polygon->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-
-
-		Graphics::Context->DrawIndexed(
-			polygon->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-			0,     // Offset to the first index we want to use
-			0);    // Offset to add to each index when looking up vertices
-	}
+	// DRAW Polygon mesh
+	polygon->Draw();
 
 	ImGui::Render(); // Turns this frame’s UI into renderable triangles
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // Draws it to the screen
