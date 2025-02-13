@@ -29,8 +29,6 @@ std::shared_ptr<Mesh> mainTriangle;
 std::shared_ptr<Mesh> rectangle;
 std::shared_ptr<Mesh> polygon;
 
-BufferStruct constBuffer;
-
 // --------------------------------------------------------
 // Called once per program, after the window and graphics API
 // are initialized but before the game loop begins
@@ -197,47 +195,32 @@ void Game::CreateGeometry()
 	XMFLOAT4 white = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	XMFLOAT4 black = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	// Set up the vertices of the triangle we would like to draw
-	// - We're going to copy this array, exactly as it exists in CPU memory
-	//    over to a Direct3D-controlled data structure on the GPU (the vertex buffer)
-	// - Note: Since we don't have a camera or really any concept of
-	//    a "3d world" yet, we're simply describing positions within the
-	//    bounds of how the rasterizer sees our screen: [-1 to +1] on X and Y
-	// - This means (0,0) is at the very center of the screen.
-	// - These are known as "Normalized Device Coordinates" or "Homogeneous 
-	//    Screen Coords", which are ways to describe a position without
-	//    knowing the exact size (in pixels) of the image/window/etc.  
-	// - Long story short: Resizing the window also resizes the triangle,
-	//    since we're describing the triangle in terms of the window itself
-	Vertex triangleVertices[] =
+	// ----- Triangle Mesh -----
+	Vertex triVerts[] =
 	{
 		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), red },
 		{ XMFLOAT3(+0.5f, -0.5f, +0.0f), blue },
-		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), green },
+		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), green }
 	};
-
-	// Set up indices, which tell us which vertices to use and in which order
-	// - This is redundant for just 3 vertices, but will be more useful later
-	// - Indices are technically not required if the vertices are in the buffer 
-	//    in the correct order and each one will be used exactly once
-	// - But just to see how it's done...
-	unsigned int triangleIndices[] = { 0, 1, 2 };
+	unsigned int triIndices[] = { 0, 1, 2 };
 
 	
-	// Vertices for the rectangle
-	Vertex rectangleVertices[] =
+	// ----- Rectangle Mesh -----
+	Vertex rectVerts[] =
 	{
 		{ XMFLOAT3(-0.7f, +0.7f, +0.0f), red },
 		{ XMFLOAT3(-0.3f, +0.7f, +0.0f), blue },
 		{ XMFLOAT3(-0.3f, +0.3f, +0.0f), blue },
 		{ XMFLOAT3(-0.7f, +0.3f, +0.0f), red },
 	};
+	unsigned int rectIndices[] = 
+	{ 
+		0, 1, 2, 
+		0, 2, 3 
+	};
 
-	//Indices for the polygon
-	unsigned int rectangleIndices[] = { 0, 1, 2, 0, 2, 3 };
-
-	// Vertices for the polygon
-	Vertex polyVertices[] =
+	// ----- Polygon Mesh -----
+	Vertex polyVerts[] =
 	{
 		{ XMFLOAT3(+0.3f, +0.5f, +0.0f), white },
 		{ XMFLOAT3(+0.4f, +0.7f, +0.0f), black },
@@ -246,16 +229,36 @@ void Game::CreateGeometry()
 		{ XMFLOAT3(+0.6f, +0.4f, +0.0f), black },
 		{ XMFLOAT3(+0.4f, +0.3f, +0.0f), black },
 	};
+	unsigned int polyIndices[] = 
+	{ 
+		0, 1, 2, 
+		2, 3, 0, 
+		3, 4, 5, 
+		5, 0, 3 
+	};
 
-	//Indices for the rectangle
-	unsigned int polyIndices[] = { 0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3 };
+	// Create the base meshes with the vertex and index buffers
+	std::shared_ptr<Mesh> tri = std::make_shared<Mesh>("Triangle", triVerts, ARRAYSIZE(triVerts), triIndices, ARRAYSIZE(triIndices));
+	std::shared_ptr<Mesh> rect = std::make_shared<Mesh>("Rectangle", rectVerts, ARRAYSIZE(rectVerts), rectIndices, ARRAYSIZE(rectIndices));
+	std::shared_ptr<Mesh> poly = std::make_shared<Mesh>("Polygon", polyVerts, ARRAYSIZE(polyVerts), polyIndices, ARRAYSIZE(polyIndices));
 
-	// Use Mesh class to create meshes
-	// Initialize Meshes
-	mainTriangle = std::make_shared<Mesh>(triangleVertices, 3, triangleIndices, 3);
-	rectangle = std::make_shared<Mesh>(rectangleVertices, 4, rectangleIndices, 6);
-	polygon = std::make_shared<Mesh>(polyVertices, 6, polyIndices, 12);
+	meshes.push_back(tri);
+	meshes.push_back(rect);
+	meshes.push_back(poly);
 
+	// Create the game entities
+	std::shared_ptr<GameEntity> g1 = std::make_shared<GameEntity>(tri);
+	std::shared_ptr<GameEntity> g2 = std::make_shared<GameEntity>(rect);
+	std::shared_ptr<GameEntity> g3 = std::make_shared<GameEntity>(poly);
+	std::shared_ptr<GameEntity> g4 = std::make_shared<GameEntity>(tri);
+	std::shared_ptr<GameEntity> g5 = std::make_shared<GameEntity>(rect);
+
+	// Add to entity vector (so Chris doesn't have to see copy-paste code)
+	entities.push_back(g1);
+	entities.push_back(g2);
+	entities.push_back(g3);
+	entities.push_back(g4);
+	entities.push_back(g5);
 }
 
 
@@ -296,26 +299,92 @@ void Game::Update(float deltaTime, float totalTime)
 	
 
 	// Begin Custom Window
-	ImGui::Begin("Inspector"); // Everything after is part of the window
-
-	// Window Size Text
-	ImGui::Text("Window Dimensions: %dx%d", Window::Width(), Window::Height());
-
-	// Framerate counter
-	ImGui::Text("Framerate: %f fps", ImGui::GetIO().Framerate);
-
-	// Number slider
-	ImGui::SliderInt("Choose a number", &number, 0, 100);
-
-	// Color picker
-	ImGui::ColorEdit4("Background Color", &color.x);
-
-	// Create a button and test for a click
-	if (ImGui::Button("Press to hide/show"))
+	ImGui::Begin("Inspector");
 	{
-		demoWindow = !demoWindow;
-	}
+		// Label width
+		ImGui::PushItemWidth(-160);
 
+		if (ImGui::TreeNode("App Details"))
+		{
+			ImGui::Spacing();
+			// Framerate
+			ImGui::Text("Frame rate: %f fps", ImGui::GetIO().Framerate);
+			// Window size
+			ImGui::Text("Window Client Size: %dx%d", Window::Width(), Window::Height());
+
+			// Demo window button
+			if (ImGui::Button(demoWindow ? "Hide ImGui Demo Window" : "Show ImGui Demo Window"))
+			{
+				demoWindow = !demoWindow;
+			}
+
+			ImGui::Spacing();
+
+			ImGui::TreePop();
+		}
+
+		// Meshes
+		if (ImGui::TreeNode("Meshes"))
+		{
+			// Loop through each mesh to show their details in the tree
+			for (int i = 0; i < meshes.size(); i++)
+			{
+				ImGui::PushID(meshes[i].get());
+
+				if (ImGui::TreeNode("Mesh Node", "Mesh: %s", meshes[i]->GetName()))
+				{
+					ImGui::Spacing();
+					ImGui::Text("Triangles: %d", meshes[i]->GetIndexCount() / 3);
+					ImGui::Text("Vertices:  %d", meshes[i]->GetVertexCount());
+					ImGui::Text("Indices:   %d", meshes[i]->GetIndexCount());
+					ImGui::Spacing();
+					ImGui::TreePop();
+				}
+
+				ImGui::PopID();
+			}
+
+			ImGui::TreePop();
+		}
+
+		/*
+		// Entities
+		if (ImGui::TreeNode("Entities"))
+		{
+			// Loop through each mesh to show their details in the tree
+			for (int i = 0; i < entities.size(); i++)
+			{
+				ImGui::PushID(meshes[i].get());
+
+				if (ImGui::TreeNode("Entity Node", "Entity: %s", i))
+				{
+					// Mesh info
+					ImGui::Spacing();
+					ImGui::Text("Mesh: %s", entities[i]->GetMesh()->GetName());
+					ImGui::Spacing();
+
+					// Transform info
+					std::shared_ptr<Transform> transform = entities[i]->GetTransform();
+					XMFLOAT3 position = transform->GetPosition();
+					XMFLOAT3 rotation = transform->GetPitchYawRoll();
+					XMFLOAT3 scale = transform->GetScale();
+
+					// Position rotation and scale
+					if (ImGui::DragFloat3("Position", &position.x, 0.01f)) transform->SetPosition(position);
+					if (ImGui::DragFloat3("Rotation (Radians)", &rotation.x, 0.01f)) transform->SetRotation(rotation);
+					if (ImGui::DragFloat3("Scale", &scale.x, 0.01f)) transform->SetScale(scale);
+
+					ImGui::Spacing();
+
+					ImGui::TreePop();
+				}
+				ImGui::PopID();
+			}
+
+			ImGui::TreePop();
+		}
+		*/
+	}
 	ImGui::End(); // Ends the current window
 
 	if (demoWindow)
@@ -345,39 +414,21 @@ void Game::Draw(float deltaTime, float totalTime)
 		Graphics::Context->ClearDepthStencilView(Graphics::DepthBufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
-	// Constant Buffer Business
-	BufferStruct vsData;
-	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 0.5f, 1.0f);
-	vsData.offset = XMFLOAT3(0.25f, 0.0f, 0.0f);
-
-	// Mapping and unmapping the buffer
-	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-	Graphics::Context->Map(vsConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-	Graphics::Context->Unmap(vsConstantBuffer.Get(), 0);
-
-	// Draw triangle mesh
-	mainTriangle->Draw();
-	
-	ImGui::Render(); // Turns this frame’s UI into renderable triangles
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // Draws it to the screen
-
-	// DRAW Rectangle mesh
-	rectangle->Draw();
-
-	ImGui::Render(); // Turns this frame’s UI into renderable triangles
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // Draws it to the screen
-
-	// DRAW Polygon mesh
-	polygon->Draw();
-
-	ImGui::Render(); // Turns this frame’s UI into renderable triangles
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData()); // Draws it to the screen
+	// Draw the geomtry
+	// Loop through game entities list to draw each
+	for (auto& e : entities)
+	{
+		e->Draw(vsConstantBuffer);
+	}
 
 	// Frame END
 	// - These should happen exactly ONCE PER FRAME
 	// - At the very end of the frame (after drawing *everything*)
 	{
+		// Draw the UI after everything else
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 		// Present at the end of the frame
 		bool vsync = Graphics::VsyncState();
 		Graphics::SwapChain->Present(
