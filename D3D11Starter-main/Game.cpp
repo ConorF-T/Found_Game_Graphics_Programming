@@ -250,8 +250,12 @@ void Game::CreateGeometry()
 	std::shared_ptr<GameEntity> g1 = std::make_shared<GameEntity>(tri);
 	std::shared_ptr<GameEntity> g2 = std::make_shared<GameEntity>(rect);
 	std::shared_ptr<GameEntity> g3 = std::make_shared<GameEntity>(poly);
-	std::shared_ptr<GameEntity> g4 = std::make_shared<GameEntity>(tri);
-	std::shared_ptr<GameEntity> g5 = std::make_shared<GameEntity>(rect);
+	std::shared_ptr<GameEntity> g4 = std::make_shared<GameEntity>(tri);		// Copy of bog triangle
+	std::shared_ptr<GameEntity> g5 = std::make_shared<GameEntity>(rect);	// Copy of rectangle
+
+	// Move the copies so they aren't overlapping
+	g4->GetTransform()->Rotate(0.0, 0.0, 0.5f);
+	g5->GetTransform()->MoveAbsolute(0.0f, -1.0f, 0.0f);
 
 	// Add to entity vector (so Chris doesn't have to see copy-paste code)
 	entities.push_back(g1);
@@ -347,7 +351,6 @@ void Game::Update(float deltaTime, float totalTime)
 			ImGui::TreePop();
 		}
 
-		/*
 		// Entities
 		if (ImGui::TreeNode("Entities"))
 		{
@@ -383,7 +386,6 @@ void Game::Update(float deltaTime, float totalTime)
 
 			ImGui::TreePop();
 		}
-		*/
 	}
 	ImGui::End(); // Ends the current window
 
@@ -396,6 +398,11 @@ void Game::Update(float deltaTime, float totalTime)
 	// Example input checking: Quit if the escape key is pressed
 	if (Input::KeyDown(VK_ESCAPE))
 		Window::Quit();
+
+	// Move some entities every frame
+	entities[3]->GetTransform()->Rotate(0, 0, deltaTime * 1.0f);
+	entities[0]->GetTransform()->SetPosition((float)sin(totalTime), 0, 0);
+	entities[1]->GetTransform()->SetPosition(0, deltaTime * 1.0f, 0);
 }
 
 
