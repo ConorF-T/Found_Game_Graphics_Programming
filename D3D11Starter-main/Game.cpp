@@ -5,7 +5,6 @@
 #include "PathHelpers.h"
 #include "Window.h"
 #include "Mesh.h"
-#include "Camera.h"
 #include "Transform.h"
 #include <memory>
 #include "BufferStruct.h"
@@ -96,9 +95,6 @@ void Game::Initialize()
 		0, // Which slot (register) to bind the buffer to?
 		1, // How many are we setting right now?
 		vsConstantBuffer.GetAddressOf()); // Array of buffers (or address of just one)
-
-	camera = std::make_shared<Camera>(
-		XMFLOAT3(0, 0, -5), 5.0f, 0.05f, XM_PIDIV4, Window::AspectRatio());
 }
 
 
@@ -269,7 +265,6 @@ void Game::CreateGeometry()
 // --------------------------------------------------------
 void Game::OnResize()
 {
-	camera->UpdteProjectMatrix(Window::AspectRatio());
 }
 
 // --------------------------------------------------------
