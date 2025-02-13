@@ -28,6 +28,8 @@ std::shared_ptr<Mesh> mainTriangle;
 std::shared_ptr<Mesh> rectangle;
 std::shared_ptr<Mesh> polygon;
 
+BufferStruct constBuffer;
+
 // --------------------------------------------------------
 // Called once per program, after the window and graphics API
 // are initialized but before the game loop begins
@@ -85,7 +87,7 @@ void Game::Initialize()
 	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
 
-	Graphics::Device->CreateBuffer(&cbDesc, 0, constBuffer.GetAddressOf());
+	Graphics::Device->CreateBuffer(&cbDesc, 0, vsConstantBuffer.GetAddressOf());
 
 	// Bind the Constant Buffer to rendering pipeline
 	Graphics::Context->VSSetConstantBuffers(
