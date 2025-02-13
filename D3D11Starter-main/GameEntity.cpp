@@ -16,12 +16,22 @@ GameEntity::~GameEntity()
 
 
 // Setter
-void GameEntity::SetMesh(std::shared_ptr<Mesh> mesh) { this->mesh = mesh; }
+void GameEntity::SetMesh(std::shared_ptr<Mesh> mesh)
+{ 
+	this->mesh = mesh; 
+}
 
 
 // Getters
-std::shared_ptr<Mesh> GameEntity::GetMesh() { return mesh; }
-std::shared_ptr<Transform> GameEntity::GetTransform() { return transform; }
+std::shared_ptr<Mesh> GameEntity::GetMesh() 
+{ 
+	return mesh; 
+
+}
+std::shared_ptr<Transform> GameEntity::GetTransform() 
+{ 
+	return transform; 
+}
 
 
 // Draw Method

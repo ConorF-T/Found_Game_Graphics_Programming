@@ -308,6 +308,7 @@ void Game::Update(float deltaTime, float totalTime)
 		// Label width
 		ImGui::PushItemWidth(-160);
 
+		// App details tree
 		if (ImGui::TreeNode("App Details"))
 		{
 			ImGui::Spacing();
@@ -324,6 +325,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 			ImGui::Spacing();
 
+			// End the tree
 			ImGui::TreePop();
 		}
 
@@ -333,6 +335,7 @@ void Game::Update(float deltaTime, float totalTime)
 			// Loop through each mesh to show their details in the tree
 			for (int i = 0; i < meshes.size(); i++)
 			{
+				// So that the labels have different id's
 				ImGui::PushID(meshes[i].get());
 
 				if (ImGui::TreeNode("Mesh Node", "Mesh: %s", meshes[i]->GetName()))
@@ -347,19 +350,19 @@ void Game::Update(float deltaTime, float totalTime)
 
 				ImGui::PopID();
 			}
-
+			// End the tree
 			ImGui::TreePop();
 		}
 
 		// Entities
 		if (ImGui::TreeNode("Entities"))
 		{
-			// Loop through each mesh to show their details in the tree
+			// Loop through each entity to show their details in the tree
 			for (int i = 0; i < entities.size(); i++)
 			{
-				ImGui::PushID(meshes[i].get());
+				ImGui::PushID(entities[i].get());
 
-				if (ImGui::TreeNode("Entity Node", "Entity: %s", i))
+				if (ImGui::TreeNode("Entity Node", "Entity: %d", i))
 				{
 					// Mesh info
 					ImGui::Spacing();

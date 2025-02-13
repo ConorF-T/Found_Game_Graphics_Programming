@@ -108,7 +108,7 @@ void Transform::Scale(DirectX::XMFLOAT3 scale)
 	this->scale.z *= scale.z;
 }
 
-// Updates
+// Update
 void Transform::UpdateMatrices()
 {
 	// Create Alternate translation rotation and scale
@@ -117,7 +117,6 @@ void Transform::UpdateMatrices()
 	XMMATRIX mScale = XMMatrixScalingFromVector(XMLoadFloat3(&scale));
 
 	// Note: Overloaded operators are defined in the DirectX namespace!
-	// Alternatively, you can call XMMatrixMultiply(XMMatrixMultiply(s, r), t))
 	XMMATRIX worldMatrix = mScale * mRotation * mTranslation;
 
 	// Store final world and transpose matrices
