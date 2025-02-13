@@ -57,7 +57,11 @@ DirectX::XMFLOAT3 Transform::GetPitchYawRoll() { return rotation; }
 DirectX::XMFLOAT3 Transform::GetScale() { return scale; }
 
 // Matrix Getters
-DirectX::XMFLOAT4X4 Transform::GetWorldMatrix() { return world; }
+DirectX::XMFLOAT4X4 Transform::GetWorldMatrix() 
+{ 
+	UpdateMatrices();
+	return world; 
+}
 DirectX::XMFLOAT4X4 Transform::GetWorldInverseTransposeMatrix() { return worldInverseTranspose; }
 
 
@@ -102,4 +106,22 @@ void Transform::Scale(DirectX::XMFLOAT3 scale)
 	this->scale.x *= scale.x;
 	this->scale.y *= scale.y;
 	this->scale.z *= scale.z;
+}
+
+// Updates
+void Transform::UpdateMatrices()
+{
+	// Create Alternate translation rotation and scale
+	XMMATRIX mTranslation = XMMatrixTranslationFromVector(XMLoadFloat3(&position));
+	XMMATRIX mRotation = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&rotation));
+	XMMATRIX mScale = XMMatrixScalingFromVector(XMLoadFloat3(&scale));
+
+	// Note: Overloaded operators are defined in the DirectX namespace!
+	// Alternatively, you can call XMMatrixMultiply(XMMatrixMultiply(s, r), t))
+	XMMATRIX worldMatrix = mScale * mRotation * mTranslation;
+
+	// Store final world and transpose matrices
+	XMStoreFloat4x4(&world, worldMatrix);
+	XMStoreFloat4x4(&worldInverseTranspose, XMMatrixInverse(0, XMMatrixTranspose(worldMatrix)));
+
 }

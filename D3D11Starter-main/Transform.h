@@ -32,6 +32,9 @@ public:
 	void Scale(float x, float y, float z);
 	void Scale(DirectX::XMFLOAT3 scale);
 
+	// Updates
+	void UpdateMatrices();
+
 private:
 	// Raw Transformational Data
 	DirectX::XMFLOAT3 position;
