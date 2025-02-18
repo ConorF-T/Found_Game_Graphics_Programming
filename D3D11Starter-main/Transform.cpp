@@ -64,6 +64,28 @@ DirectX::XMFLOAT4X4 Transform::GetWorldMatrix()
 }
 DirectX::XMFLOAT4X4 Transform::GetWorldInverseTransposeMatrix() { return worldInverseTranspose; }
 
+// Vector Getters
+DirectX::XMFLOAT3 Transform::GetUp()
+{
+	XMVECTOR rotationQuaternion = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&rotation));
+	XMStoreFloat3(&up, XMVector3Rotate(XMVectorSet(0, 1, 0, 0), rotationQuaternion));
+	return up;
+}
+
+DirectX::XMFLOAT3 Transform::GetRight()
+{
+	XMVECTOR rotationQuaternion = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&rotation));
+	XMStoreFloat3(&right, XMVector3Rotate(XMVectorSet(1, 0, 0, 0), rotationQuaternion));
+	return right;
+}
+
+DirectX::XMFLOAT3 Transform::GetForward()
+{
+	XMVECTOR rotationQuaternion = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&rotation));
+	XMStoreFloat3(&forward, XMVector3Rotate(XMVectorSet(0, 0, 1, 0), rotationQuaternion));
+	return forward;
+}
+
 
 // Transformers
 void Transform::MoveAbsolute(float x, float y, float z)
@@ -78,6 +100,23 @@ void Transform::MoveAbsolute(DirectX::XMFLOAT3 offset)
 	position.x += offset.x;
 	position.y += offset.y;
 	position.z += offset.z;
+}
+
+void Transform::MoveRelative(float x, float y, float z)
+{
+	// Store the rotation and movement as vectors
+	XMVECTOR absoluteMove = XMVectorSet(x, y, z, 0);
+	XMVECTOR absoluteRot = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&rotation));
+
+	// Create the vector with the transformation information relative
+	XMVECTOR absoluteDirection = XMVector3Rotate(absoluteMove, absoluteRot);
+
+	XMStoreFloat3(&position, XMLoadFloat3(&position) + absoluteDirection);
+}
+
+void Transform::MoveRelative(DirectX::XMFLOAT3 offset)
+{
+	MoveRelative(offset.x, offset.y, offset.z);
 }
 
 void Transform::Rotate(float pitch, float yaw, float roll)
