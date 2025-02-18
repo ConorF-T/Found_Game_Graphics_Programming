@@ -3,9 +3,6 @@
 #include <d3d11.h>
 #include <wrl/client.h>
 
-#include "Mesh.h"
-#include "GameEntity.h"
-
 class Game
 {
 public:
@@ -37,13 +34,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> vsConstantBuffer;
 
+	// Camera for the 3D scene
+	std::shared_ptr<Camera> camera;
+
 	// Shaders and shader-related constructs
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
-
-	// Vectors to hold our meshes and entities
-	std::vector<std::shared_ptr<Mesh>> meshes;
-	std::vector<std::shared_ptr<GameEntity>> entities;
 };
 
