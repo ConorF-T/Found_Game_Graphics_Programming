@@ -9,7 +9,7 @@ class Mesh
 {
 public:
 	// Basic OOP Setup
-	Mesh(Vertex vertices[], int verticesSize, unsigned int indices[], int indicesSize);
+	Mesh(const char* name, Vertex vertices[], int verticesSize, unsigned int indices[], int indicesSize);
 	~Mesh();
 	Mesh(const Mesh&) = delete;
 	Mesh& operator = (const Mesh&) = delete;
@@ -19,6 +19,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> GetIndexBuffer();
 	int GetIndexCount();
 	int GetVertexCount();
+	const char* GetName();
 	void Draw();
 
 private:
@@ -30,6 +31,8 @@ private:
 	int numVertices;
 	int numIndices;
 
+	// Name for the UI
+	const char* name;
 };
 
 

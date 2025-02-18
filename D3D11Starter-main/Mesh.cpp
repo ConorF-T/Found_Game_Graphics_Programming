@@ -10,7 +10,7 @@
 
 using namespace DirectX;
 
-Mesh::Mesh (Vertex vertices[], int verticesSize, unsigned int indices[], int indicesSize)
+Mesh::Mesh (const char* name, Vertex vertices[], int verticesSize, unsigned int indices[], int indicesSize) : name(name)
 {
 	
 	numIndices = indicesSize;
@@ -80,6 +80,11 @@ int Mesh::GetVertexCount()
 int Mesh::GetIndexCount()
 {
 	return numIndices;
+}
+
+const char* Mesh::GetName()
+{ 
+	return name;
 }
 
 void Mesh::Draw()
