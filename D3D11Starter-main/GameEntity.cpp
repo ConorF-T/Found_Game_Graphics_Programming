@@ -35,12 +35,14 @@ std::shared_ptr<Transform> GameEntity::GetTransform()
 
 
 // Draw Method
-void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11Buffer> vsConstantBuffer)
+void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11Buffer> vsConstantBuffer, std::shared_ptr<Camera> camera)
 {
 	// Constant Buffer Business
 	BufferStruct vsData;
 	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 0.5f, 1.0f);
 	vsData.world = transform->GetWorldMatrix();
+	vsData.view = camera->GetView();
+	vsData.projection = camera->GetProjection();
 
 	// Mapping and unmapping the buffer
 	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};

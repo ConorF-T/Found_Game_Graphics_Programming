@@ -7,7 +7,7 @@
 class Camera
 {
 public:
-	Camera(DirectX::XMFLOAT3 position, float fieldOfView, float aspectRatio, float nearClip, float farClip, bool perspective);
+	Camera(DirectX::XMFLOAT3 position, float fieldOfView, float aspectRatio, float nearClip, float farClip, bool perspective, float movementSpeed, float mouseLookSpeed);
 	~Camera();
 
 	// Updating methods
@@ -26,6 +26,9 @@ public:
 	float GetFarClip();
 	float GetOrthographicWidth();
 	bool GetProjectionType();
+	bool GetActive();
+	float GetMoveSpeed();
+	float GetSensativity();
 
 	// Setters
 	void SetFieldOfView(float fov);
@@ -33,6 +36,9 @@ public:
 	void SetFarClip(float distance);
 	void SetOrthographicWidth(float width);
 	void SetProjectionType(bool perspectiveBool);
+	void SetActive(bool active);
+	void SetMoveSpeed(float speed);
+	void SetSensativity(float speed);
 
 private:
 	// Camera matrices
@@ -48,9 +54,13 @@ private:
 	float nearClipPlane;
 	float farClipPlane;
 	float orthographicWidth;
+	float movementSpeed;
+	float mouseLookSpeed;
 
 	// Whether the camera is in perspective or orthographic mode
 	bool perspective;
 
-};
+	// Whether the camera is active or not
+	bool isActive;
 
+};

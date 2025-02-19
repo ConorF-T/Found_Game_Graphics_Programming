@@ -5,6 +5,7 @@
 #include <memory>
 #include "Mesh.h"
 #include "Transform.h"
+#include "Camera.h"
 
 class GameEntity
 {
@@ -20,7 +21,7 @@ public:
 	std::shared_ptr<Transform> GetTransform();
 
 	// Draw Method
-	void Draw(Microsoft::WRL::ComPtr<ID3D11Buffer> vsConstantBuffer);
+	void Draw(Microsoft::WRL::ComPtr<ID3D11Buffer> vsConstantBuffer, std::shared_ptr<Camera> camera);
 
 private:
 	// Mehs and transform

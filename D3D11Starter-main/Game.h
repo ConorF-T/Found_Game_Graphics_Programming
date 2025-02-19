@@ -5,6 +5,7 @@
 
 #include "Mesh.h"
 #include "GameEntity.h"
+#include "Camera.h"
 
 class Game
 {
@@ -45,5 +46,13 @@ private:
 	// Vectors to hold our meshes and entities
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	std::vector<std::shared_ptr<GameEntity>> entities;
+
+	// Game Camera
+	std::vector<std::shared_ptr<Camera>> cameras;
+	float cameraMoveSpeed = 1.0f;
+	float cameraSensativity = 0.001f;
+
+	// Window Color
+	float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
 };
 

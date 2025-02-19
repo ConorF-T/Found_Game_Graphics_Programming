@@ -31,7 +31,7 @@ public:
 	void MoveAbsolute(float x, float y, float z);
 	void MoveAbsolute(DirectX::XMFLOAT3 offset);
 	void MoveRelative(float x, float y, float z);
-	void MoveRelative(XMFLOAT3 offset);
+	void MoveRelative(DirectX::XMFLOAT3 offset);
 	void Rotate(float pitch, float yaw, float roll);
 	void Rotate(DirectX::XMFLOAT3 rotation);
 	void Scale(float x, float y, float z);
