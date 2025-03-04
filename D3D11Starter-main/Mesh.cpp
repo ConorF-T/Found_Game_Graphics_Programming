@@ -272,6 +272,9 @@ void Mesh::Draw()
 		0);
 }
 
+/// <summary>
+/// Helper method to create buffers for our meshes
+/// </summary>
 void Mesh::CreateBuffers(Vertex* verts, size_t numVertices, unsigned int* indices, size_t numIndices)
 {
 	// Create the vertex buffer using our passed vertices
