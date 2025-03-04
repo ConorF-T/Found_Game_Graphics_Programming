@@ -19,6 +19,9 @@
     <Filter Include="Source Files\ImGui">
       <UniqueIdentifier>{b63076e2-3ce2-4e00-bd93-971e3dee4fbb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{94411b81-2732-4a0c-b3cc-73a54e3f74f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -148,5 +151,22 @@
     <FxCompile Include="VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Assets\cube.obj">
+      <Filter>Objects</Filter>
+    </Object>
+    <Object Include="Assets\cylinder.obj">
+      <Filter>Objects</Filter>
+    </Object>
+    <Object Include="Assets\helix.obj">
+      <Filter>Objects</Filter>
+    </Object>
+    <Object Include="Assets\quad.obj">
+      <Filter>Objects</Filter>
+    </Object>
+    <Object Include="Assets\quad_double_sided.obj">
+      <Filter>Objects</Filter>
+    </Object>
   </ItemGroup>
 </Project>

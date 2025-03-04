@@ -221,7 +221,7 @@ Mesh::Mesh(const char* name, const char* fileName) : name(name)
 	numVertices = vertCounter;
 
 	// Create the buffers using helper method
-	CreateBuffers(&verts[0], vertCounter, &indices[0], indexCounter)
+	CreateBuffers(&verts[0], vertCounter, &indices[0], indexCounter);
 }
 
 

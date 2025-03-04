@@ -22,7 +22,7 @@ public:
 	int GetVertexCount();
 	const char* GetName();
 	void Draw();
-
+	void CreateBuffers(Vertex* verts, size_t numVertices, unsigned int* indices, size_t numIndices);
 
 private:
 	// Buffers for geometric data
