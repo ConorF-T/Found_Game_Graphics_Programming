@@ -219,13 +219,6 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Object Include="Assets\cube.obj" />
-    <Object Include="Assets\cylinder.obj" />
-    <Object Include="Assets\helix.obj" />
-    <Object Include="Assets\quad.obj" />
-    <Object Include="Assets\quad_double_sided.obj" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

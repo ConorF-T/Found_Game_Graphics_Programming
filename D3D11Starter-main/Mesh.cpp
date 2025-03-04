@@ -13,7 +13,7 @@
 
 using namespace DirectX;
 
-Mesh::Mesh (const char* name, Vertex vertices[], int verticesSize, unsigned int indices[], int indicesSize) : name(name)
+Mesh::Mesh (const char* name, Vertex vertices[], size_t verticesSize, unsigned int indices[], size_t indicesSize) : name(name)
 {
 	numIndices = indicesSize;
 	numVertices = verticesSize;

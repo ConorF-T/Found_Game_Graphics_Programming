@@ -9,7 +9,7 @@ class Mesh
 {
 public:
 	// Basic OOP Setup
-	Mesh(const char* name, Vertex vertices[], int verticesSize, unsigned int indices[], int indicesSize);
+	Mesh(const char* name, Vertex vertices[], size_t verticesSize, unsigned int indices[], size_t indicesSize);
 	Mesh(const char* name, const char* fileName);
 	~Mesh();
 	Mesh(const Mesh&) = delete;

@@ -136,7 +136,8 @@ void Game::CreateGeometry()
 	std::shared_ptr<Material> matGreen = std::make_shared<Material>(green, vertexShader, pixelShader);
 	std::shared_ptr<Material> matBlue = std::make_shared<Material>(blue, vertexShader, pixelShader);
 
-
+	// Create our meshes with .obj files
+	std::make_shared<Mesh>("Sphere", FixPath("../../Assets/sphere.obj").c_str());
 }
 
 
