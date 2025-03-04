@@ -5,7 +5,7 @@
 
 using namespace DirectX;
 
-GameEntity::GameEntity(std::shared_ptr<Mesh> mesh) : mesh(mesh)
+GameEntity::GameEntity(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> mat) : mesh(mesh), material(mat)
 {
 	transform = std::make_shared<Transform>();
 }
@@ -21,6 +21,10 @@ void GameEntity::SetMesh(std::shared_ptr<Mesh> mesh)
 	this->mesh = mesh; 
 }
 
+void GameEntity::SetMaterial(std::shared_ptr<Material> mat)
+{
+}
+
 
 // Getters
 std::shared_ptr<Mesh> GameEntity::GetMesh() 
@@ -33,22 +37,26 @@ std::shared_ptr<Transform> GameEntity::GetTransform()
 	return transform; 
 }
 
+std::shared_ptr<Material> GameEntity::GetMaterial()
+{
+	return std::shared_ptr<Material>();
+}
+
 
 // Draw Method
-void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11Buffer> vsConstantBuffer, std::shared_ptr<Camera> camera)
+void GameEntity::Draw(std::shared_ptr<Camera> camera)
 {
 	// Constant Buffer Business
-	BufferStruct vsData;
-	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 0.5f, 1.0f);
-	vsData.world = transform->GetWorldMatrix();
-	vsData.view = camera->GetView();
-	vsData.projection = camera->GetProjection();
+	std::shared_ptr<SimpleVertexShader> vs = material->GetVertexShader();
+	vs->SetFloat4("colorTint", material->GetColorTint()); // Strings here MUST
+	vs->SetMatrix4x4("world", transform->GetWorldMatrix()); // match variable
+	vs->SetMatrix4x4("view", camera->GetView()); // names in your
+	vs->SetMatrix4x4("projection", camera->GetProjection()); // shader’s cbuffer!
+	vs->CopyAllBufferData();
 
-	// Mapping and unmapping the buffer
-	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-	Graphics::Context->Map(vsConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-	Graphics::Context->Unmap(vsConstantBuffer.Get(), 0);
+	// Activate our shaders
+	material->GetVertexShader()->SetShader();
+	material->GetPixelShader()->SetShader();
 
 	// Draw the mesh using m the mesh draw function
 	mesh->Draw();

@@ -10,6 +10,7 @@ class Mesh
 public:
 	// Basic OOP Setup
 	Mesh(const char* name, Vertex vertices[], int verticesSize, unsigned int indices[], int indicesSize);
+	Mesh(const char* name, const char* fileName);
 	~Mesh();
 	Mesh(const Mesh&) = delete;
 	Mesh& operator = (const Mesh&) = delete;
@@ -21,6 +22,7 @@ public:
 	int GetVertexCount();
 	const char* GetName();
 	void Draw();
+
 
 private:
 	// Buffers for geometric data
