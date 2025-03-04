@@ -88,8 +88,8 @@ void Camera::Update(float dt)
 	if (Input::MouseRightDown())
 	{
 		// Get how much the mouse has moved in either X or Y this frame
-		int cursorMovementX = Input::GetMouseXDelta() * mouseLookSpeed;
-		int cursorMovementY = Input::GetMouseYDelta() * mouseLookSpeed;
+		float cursorMovementX = Input::GetMouseXDelta() * mouseLookSpeed;
+		float cursorMovementY = Input::GetMouseYDelta() * mouseLookSpeed;
 		
 		// Rotate the camera
 		transform->Rotate(cursorMovementY, cursorMovementX, 0);	// Flipped due to how pitch and yaw work
