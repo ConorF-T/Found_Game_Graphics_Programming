@@ -19,7 +19,13 @@ struct VertexToPixel
 // Constant Buffer External Shader data
 cbuffer ExternalData : register(b0)
 {
-	float3 colorTint;
+	float4 colorTint;
+};
+
+// Function for a random number
+float random(float2 s)
+{
+	return frac(sin(dot(s, float2(12.9898, 78.233))) * 43758.5453123);
 };
 
 // --------------------------------------------------------
@@ -33,9 +39,9 @@ cbuffer ExternalData : register(b0)
 // --------------------------------------------------------
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	// Just return the input color
-	// - This color (like most values passing through the rasterizer) is 
-	//   interpolated for each pixel between the corresponding vertices 
-	//   of the triangle we're rendering
-	return float4(colorTint, 1);
+	float2 st = input.screenPosition.xy;
+
+	float rand = random(st);
+
+	return float4(rand, rand, rand, 1.0f);
 }

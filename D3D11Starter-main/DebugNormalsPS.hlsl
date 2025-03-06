@@ -19,7 +19,7 @@ struct VertexToPixel
 // Constant Buffer External Shader data
 cbuffer ExternalData : register(b0)
 {
-	float3 colorTint;
+	float4 colorTint;
 };
 
 // --------------------------------------------------------

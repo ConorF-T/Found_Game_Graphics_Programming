@@ -148,33 +148,25 @@ void Game::CreateGeometry()
 	std::shared_ptr<Mesh> torusMesh = std::make_shared<Mesh>("Torus", FixPath("../../Assets/torus.obj").c_str());
 
 	// Create the GameEntities
-	std::shared_ptr<GameEntity> gameCube1 = std::make_shared<GameEntity>(cubeMesh, matGreen);
-	std::shared_ptr<GameEntity> gameCylinder1 = std::make_shared<GameEntity>(cylinderMesh, matWhite);
-	std::shared_ptr<GameEntity> gameHelix1 = std::make_shared<GameEntity>(helixMesh, matBlack);
-	std::shared_ptr<GameEntity> gameQuad1 = std::make_shared<GameEntity>(quadMesh, matRed);
-	std::shared_ptr<GameEntity> gameDubQuad1 = std::make_shared<GameEntity>(dubQuadMesh, matGreen);
-	std::shared_ptr<GameEntity> gameSphere1 = std::make_shared<GameEntity>(sphereMesh, matBlue);
-	std::shared_ptr<GameEntity> gameTorus1 = std::make_shared<GameEntity>(torusMesh, matGreen);
-
-	std::shared_ptr<GameEntity> gameCube2 = std::make_shared<GameEntity>(cubeMesh, matGreen);
-	std::shared_ptr<GameEntity> gameCylinder2 = std::make_shared<GameEntity>(cylinderMesh, matWhite);
-	std::shared_ptr<GameEntity> gameHelix2 = std::make_shared<GameEntity>(helixMesh, matBlack);
-	std::shared_ptr<GameEntity> gameQuad2 = std::make_shared<GameEntity>(quadMesh, matRed);
-	std::shared_ptr<GameEntity> gameDubQuad2 = std::make_shared<GameEntity>(dubQuadMesh, matGreen);
-	std::shared_ptr<GameEntity> gameSphere2 = std::make_shared<GameEntity>(sphereMesh, matBlue);
-	std::shared_ptr<GameEntity> gameTorus2 = std::make_shared<GameEntity>(torusMesh, matGreen);
+	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, customMat);
+	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, customMat);
+	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, customMat);
+	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, customMat);
+	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, customMat);
+	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, customMat);
+	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, customMat);
 
 	// Add the entities to the entities list
-	entities.push_back(gameCube1);
-	entities.push_back(gameCylinder1);
-	entities.push_back(gameHelix1);
-	entities.push_back(gameQuad1);
-	entities.push_back(gameDubQuad1);
-	entities.push_back(gameSphere1);
-	entities.push_back(gameTorus1);
+	entities.push_back(gameCube);
+	entities.push_back(gameCylinder);
+	entities.push_back(gameHelix);
+	entities.push_back(gameQuad);
+	entities.push_back(gameDubQuad);
+	entities.push_back(gameSphere);
+	entities.push_back(gameTorus);
 
 	// Adjust the transforms
-	float adjust = -10.0f;
+	float adjust = -9.0f;
 	for (int i = 0; i < entities.size(); i++)
 	{
 		entities[i]->GetTransform()->MoveAbsolute(adjust, 0.0f, 10.0f);
@@ -185,6 +177,30 @@ void Game::CreateGeometry()
 	entities[3]->GetTransform()->Rotate(-1.0f, 0, 0);
 	entities[4]->GetTransform()->Rotate(1.0f, 0, 0);
 	entities[6]->GetTransform()->Rotate(1.5f, 0, 0);
+
+	// Create the examples for the other shaders
+	for (int i = 0; i < 7; i++)
+	{
+		// Create GameEntity with the UV material and the list item's mesh
+		std::shared_ptr<Mesh> mesh = entities[i]->GetMesh();
+		std::shared_ptr<GameEntity> gameUV = std::make_shared<GameEntity>(mesh, uvMat);
+
+		// Set up its transform to be the same but offset in the y
+		gameUV->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
+		gameUV->GetTransform()->MoveAbsolute(0, -3.0f, 0);
+
+		// Do the same but for an entity with the normal material
+		std::shared_ptr<GameEntity> gameNormal = std::make_shared<GameEntity>(mesh, normalMat);
+
+		// Set up its transform same as before
+		gameNormal->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
+		gameNormal->GetTransform()->MoveAbsolute(0, -6.0f, 0);
+		gameNormal->GetTransform()->Rotate(0, -4.0f, 0);	// Also rotate the normal ones to see better
+
+		// Put both the new entities in the list
+		entities.push_back(gameUV);
+		entities.push_back(gameNormal);
+	}
 }
 
 

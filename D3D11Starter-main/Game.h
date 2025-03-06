@@ -44,7 +44,7 @@ private:
 
 	// Game Camera
 	std::vector<std::shared_ptr<Camera>> cameras;
-	float cameraMoveSpeed = 1.0f;
+	float cameraMoveSpeed = 3.0f;
 	float cameraSensativity = 0.001f;
 
 	// Window Color

@@ -20,7 +20,7 @@ struct VertexToPixel
 // Constant Buffer External Shader data
 cbuffer ExternalData : register(b0)
 {
-	float3 colorTint;
+	float4 colorTint;
 };
 
 // --------------------------------------------------------
@@ -38,5 +38,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// - This color (like most values passing through the rasterizer) is 
 	//   interpolated for each pixel between the corresponding vertices 
 	//   of the triangle we're rendering
-	return float3(colorTint, 1);
+	return float4(colorTint);
 }

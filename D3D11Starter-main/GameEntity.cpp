@@ -48,11 +48,15 @@ void GameEntity::Draw(std::shared_ptr<Camera> camera)
 {
 	// Constant Buffer Business
 	std::shared_ptr<SimpleVertexShader> vs = material->GetVertexShader();
-	vs->SetFloat4("colorTint", material->GetColorTint()); // Strings here MUST
-	vs->SetMatrix4x4("world", transform->GetWorldMatrix()); // match variable
-	vs->SetMatrix4x4("view", camera->GetView()); // names in your
-	vs->SetMatrix4x4("projection", camera->GetProjection()); // shader’s cbuffer!
+	vs->SetMatrix4x4("world", transform->GetWorldMatrix());
+	vs->SetMatrix4x4("view", camera->GetView());
+	vs->SetMatrix4x4("projection", camera->GetProjection());
 	vs->CopyAllBufferData();
+
+	// More constant buffer business with the pixel shader this time
+	std::shared_ptr<SimplePixelShader> ps = material->GetPixelShader();
+	ps->SetFloat4("colorTint", material->GetColorTint());
+	ps->CopyAllBufferData();
 
 	// Activate our shaders
 	material->GetVertexShader()->SetShader();
