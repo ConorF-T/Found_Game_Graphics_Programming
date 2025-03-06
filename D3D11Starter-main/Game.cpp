@@ -68,7 +68,7 @@ void Game::Initialize()
 
 	// Create our new camera
 	std::shared_ptr<Camera> gameCamera = std::make_shared<Camera>(
-		XMFLOAT3(0.0f, 0.0f, 0.0f),
+		XMFLOAT3(0.0f, 0.0f, -5.0f),
 		XM_PIDIV4,
 		Window::AspectRatio(),
 		1.0f,
@@ -83,7 +83,7 @@ void Game::Initialize()
 
 	// Create our second camera
 	std::shared_ptr<Camera> altCamera = std::make_shared<Camera>(
-		XMFLOAT3(0.0f, 0.0f, -5.0f),
+		XMFLOAT3(0.0f, 0.0f, 0.0f),
 		XM_PIDIV4,
 		Window::AspectRatio(),
 		1.0f,
@@ -135,9 +135,48 @@ void Game::CreateGeometry()
 	std::shared_ptr<Material> matRed = std::make_shared<Material>(red, vertexShader, pixelShader);
 	std::shared_ptr<Material> matGreen = std::make_shared<Material>(green, vertexShader, pixelShader);
 	std::shared_ptr<Material> matBlue = std::make_shared<Material>(blue, vertexShader, pixelShader);
+	std::shared_ptr<Material> matWhite = std::make_shared<Material>(white, vertexShader, pixelShader);
+	std::shared_ptr<Material> matBlack = std::make_shared<Material>(black, vertexShader, pixelShader);
 
 	// Create our meshes with .obj files
-	std::make_shared<Mesh>("Sphere", FixPath("../../Assets/sphere.obj").c_str());
+	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>("Cube", FixPath("../../Assets/cube.obj").c_str());
+	std::shared_ptr<Mesh> cylinderMesh = std::make_shared<Mesh>("Cylinder", FixPath("../../Assets/cylinder.obj").c_str());
+	std::shared_ptr<Mesh> helixMesh = std::make_shared<Mesh>("Helix", FixPath("../../Assets/helix.obj").c_str());
+	std::shared_ptr<Mesh> quadMesh = std::make_shared<Mesh>("Quad", FixPath("../../Assets/quad.obj").c_str());
+	std::shared_ptr<Mesh> dubQuadMesh = std::make_shared<Mesh>("Double Quad", FixPath("../../Assets/quad_double_sided.obj").c_str());
+	std::shared_ptr<Mesh> sphereMesh = std::make_shared<Mesh>("Sphere", FixPath("../../Assets/sphere.obj").c_str());
+	std::shared_ptr<Mesh> torusMesh = std::make_shared<Mesh>("Torus", FixPath("../../Assets/torus.obj").c_str());
+
+	// Create the GameEntities
+	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, matGreen);
+	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, matWhite);
+	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, matBlack);
+	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, matRed);
+	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, matGreen);
+	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, matBlue);
+	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, matGreen);
+
+	// Add the entities to the entities list
+	entities.push_back(gameCube);
+	entities.push_back(gameCylinder);
+	entities.push_back(gameHelix);
+	entities.push_back(gameQuad);
+	entities.push_back(gameDubQuad);
+	entities.push_back(gameSphere);
+	entities.push_back(gameTorus);
+
+	// Adjust the transforms
+	float adjust = -10.0f;
+	for (int i = 0; i < entities.size(); i++)
+	{
+		entities[i]->GetTransform()->MoveAbsolute(adjust, 0.0f, 10.0f);
+		adjust += 3.0f;
+	}
+
+	// Adjusting the quads and torus to see them better
+	entities[3]->GetTransform()->Rotate(-1.0f, 0, 0);
+	entities[4]->GetTransform()->Rotate(1.0f, 0, 0);
+	entities[6]->GetTransform()->Rotate(1.5f, 0, 0);
 }
 
 
@@ -356,9 +395,9 @@ void Game::Update(float deltaTime, float totalTime)
 		Window::Quit();
 
 	// Move some entities every frame
-	entities[3]->GetTransform()->Rotate(0, 0, deltaTime * 1.0f);
-	entities[0]->GetTransform()->SetPosition((float)sin(totalTime), 0, 0);
-	entities[1]->GetTransform()->SetPosition(0, deltaTime * 1.0f, 0);
+	//entities[3]->GetTransform()->Rotate(0, 0, deltaTime * 1.0f);
+	//entities[0]->GetTransform()->SetPosition((float)sin(totalTime), 0, 0);
+	//entities[1]->GetTransform()->SetPosition(0, deltaTime * 1.0f, 0);
 }
 
 
