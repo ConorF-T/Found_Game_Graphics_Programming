@@ -7,7 +7,6 @@
 #include "Mesh.h"
 #include "Transform.h"
 #include <memory>
-#include "BufferStruct.h"
 
 #include <DirectXMath.h>
 
@@ -44,16 +43,6 @@ void Game::Initialize()
 		// geometric primitives (points, lines or triangles) we want to draw.  
 		// Essentially: "What kind of shape should the GPU draw with our vertices?"
 		Graphics::Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// Ensure the pipeline knows how to interpret all the numbers stored in
-		// the vertex buffer. For this course, all of your vertices will probably
-		// have the same layout, so we can just set this once at startup.
-
-
-		// Set the active vertex and pixel shaders
-		//  - Once you start applying different shaders to different objects,
-		//    these calls will need to happen multiple times per frame
-
 	}
 
 	// Initialize ImGui itself & platform/renderer backends
@@ -77,6 +66,7 @@ void Game::Initialize()
 		cameraMoveSpeed,	// Will be able to be changed with a UI element (hopefully)
 		cameraSensativity	// Same thing here (hopefully)
 		);
+
 	// Set the camera to be active
 	gameCamera->SetActive(true);
 	cameras.push_back(gameCamera);
@@ -92,6 +82,7 @@ void Game::Initialize()
 		cameraMoveSpeed,	// Will be able to be changed with a UI element (hopefully)
 		cameraSensativity	// Same thing here (hopefully)
 	);
+
 	// Set the alt camera to inactive
 	altCamera->SetActive(false);
 	cameras.push_back(altCamera);
@@ -130,6 +121,12 @@ void Game::CreateGeometry()
 		Graphics::Device, Graphics::Context, FixPath(L"VertexShader.cso").c_str());
 	std::shared_ptr<SimplePixelShader> pixelShader = std::make_shared<SimplePixelShader>(
 		Graphics::Device, Graphics::Context, FixPath(L"PixelShader.cso").c_str());
+	std::shared_ptr<SimplePixelShader> uvPixelShader = std::make_shared<SimplePixelShader>(
+		Graphics::Device, Graphics::Context, FixPath(L"DebugUVsPS.cso").c_str());
+	std::shared_ptr<SimplePixelShader> normalPixelShader = std::make_shared<SimplePixelShader>(
+		Graphics::Device, Graphics::Context, FixPath(L"DebugNormalsPS.cso").c_str());
+	std::shared_ptr<SimplePixelShader> customPixelShader = std::make_shared<SimplePixelShader>(
+		Graphics::Device, Graphics::Context, FixPath(L"CustomPS.cso").c_str());
 
 	// Create our materials
 	std::shared_ptr<Material> matRed = std::make_shared<Material>(red, vertexShader, pixelShader);
@@ -137,6 +134,9 @@ void Game::CreateGeometry()
 	std::shared_ptr<Material> matBlue = std::make_shared<Material>(blue, vertexShader, pixelShader);
 	std::shared_ptr<Material> matWhite = std::make_shared<Material>(white, vertexShader, pixelShader);
 	std::shared_ptr<Material> matBlack = std::make_shared<Material>(black, vertexShader, pixelShader);
+	std::shared_ptr<Material> uvMat = std::make_shared<Material>(white, vertexShader, uvPixelShader);
+	std::shared_ptr<Material> normalMat = std::make_shared<Material>(white, vertexShader, normalPixelShader);
+	std::shared_ptr<Material> customMat = std::make_shared<Material>(white, vertexShader, customPixelShader);
 
 	// Create our meshes with .obj files
 	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>("Cube", FixPath("../../Assets/cube.obj").c_str());
@@ -148,22 +148,30 @@ void Game::CreateGeometry()
 	std::shared_ptr<Mesh> torusMesh = std::make_shared<Mesh>("Torus", FixPath("../../Assets/torus.obj").c_str());
 
 	// Create the GameEntities
-	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, matGreen);
-	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, matWhite);
-	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, matBlack);
-	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, matRed);
-	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, matGreen);
-	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, matBlue);
-	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, matGreen);
+	std::shared_ptr<GameEntity> gameCube1 = std::make_shared<GameEntity>(cubeMesh, matGreen);
+	std::shared_ptr<GameEntity> gameCylinder1 = std::make_shared<GameEntity>(cylinderMesh, matWhite);
+	std::shared_ptr<GameEntity> gameHelix1 = std::make_shared<GameEntity>(helixMesh, matBlack);
+	std::shared_ptr<GameEntity> gameQuad1 = std::make_shared<GameEntity>(quadMesh, matRed);
+	std::shared_ptr<GameEntity> gameDubQuad1 = std::make_shared<GameEntity>(dubQuadMesh, matGreen);
+	std::shared_ptr<GameEntity> gameSphere1 = std::make_shared<GameEntity>(sphereMesh, matBlue);
+	std::shared_ptr<GameEntity> gameTorus1 = std::make_shared<GameEntity>(torusMesh, matGreen);
+
+	std::shared_ptr<GameEntity> gameCube2 = std::make_shared<GameEntity>(cubeMesh, matGreen);
+	std::shared_ptr<GameEntity> gameCylinder2 = std::make_shared<GameEntity>(cylinderMesh, matWhite);
+	std::shared_ptr<GameEntity> gameHelix2 = std::make_shared<GameEntity>(helixMesh, matBlack);
+	std::shared_ptr<GameEntity> gameQuad2 = std::make_shared<GameEntity>(quadMesh, matRed);
+	std::shared_ptr<GameEntity> gameDubQuad2 = std::make_shared<GameEntity>(dubQuadMesh, matGreen);
+	std::shared_ptr<GameEntity> gameSphere2 = std::make_shared<GameEntity>(sphereMesh, matBlue);
+	std::shared_ptr<GameEntity> gameTorus2 = std::make_shared<GameEntity>(torusMesh, matGreen);
 
 	// Add the entities to the entities list
-	entities.push_back(gameCube);
-	entities.push_back(gameCylinder);
-	entities.push_back(gameHelix);
-	entities.push_back(gameQuad);
-	entities.push_back(gameDubQuad);
-	entities.push_back(gameSphere);
-	entities.push_back(gameTorus);
+	entities.push_back(gameCube1);
+	entities.push_back(gameCylinder1);
+	entities.push_back(gameHelix1);
+	entities.push_back(gameQuad1);
+	entities.push_back(gameDubQuad1);
+	entities.push_back(gameSphere1);
+	entities.push_back(gameTorus1);
 
 	// Adjust the transforms
 	float adjust = -10.0f;
