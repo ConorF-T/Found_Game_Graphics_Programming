@@ -4,6 +4,8 @@
 #include "Camera.h"
 #include "Transform.h"
 
+#include <unordered_map>
+
 class Material
 {
 public:
@@ -23,5 +25,9 @@ private:
 	DirectX::XMFLOAT4 colorTint;
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShader;
+
+	// Hash Tables
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> textureSRVs;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>> samplers;
 };
 

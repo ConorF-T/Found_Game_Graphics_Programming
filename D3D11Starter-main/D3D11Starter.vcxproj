@@ -241,7 +241,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Assets\Textures\brick_texture.jfif" />
+    <Image Include="Assets\Textures\brick_texture.jpg" />
     <Image Include="Assets\Textures\sand_texture.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

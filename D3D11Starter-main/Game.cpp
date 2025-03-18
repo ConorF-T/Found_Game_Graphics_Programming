@@ -6,6 +6,7 @@
 #include "Window.h"
 #include "Mesh.h"
 #include "Transform.h"
+#include "WICTextureLoader.h"
 #include <memory>
 
 #include <DirectXMath.h>
@@ -128,7 +129,31 @@ void Game::CreateGeometry()
 	std::shared_ptr<SimplePixelShader> customPixelShader = std::make_shared<SimplePixelShader>(
 		Graphics::Device, Graphics::Context, FixPath(L"CustomPS.cso").c_str());
 
+	// Load some textures
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> brickSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/brick_texture.jpg"), nullptr, brickSRV.GetAddressOf());
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sandSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/sand_texture.jpg"), nullptr, sandSRV.GetAddressOf());
+
+	// Sampler State stuff
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;		// Give us the best for angles
+	samplerDesc.MaxAnisotropy = 8;						// Setting this to medium because idk exaclty how it effects things
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	// Actually Create it
+	Graphics::Device->CreateSamplerState(&samplerDesc, samplerState.GetAddressOf());
+
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> textureSRVs;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>> samplers;
+
 	// Create our materials
+	std::shared_ptr<Material> matBricks = std::make_shared<Material>(white, vertexShader, pixelShader);
+	matBricks->AddSampler("BasicSampler", samplerState);
+
 	std::shared_ptr<Material> matRed = std::make_shared<Material>(red, vertexShader, pixelShader);
 	std::shared_ptr<Material> matGreen = std::make_shared<Material>(green, vertexShader, pixelShader);
 	std::shared_ptr<Material> matBlue = std::make_shared<Material>(blue, vertexShader, pixelShader);
