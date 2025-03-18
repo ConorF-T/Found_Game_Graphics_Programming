@@ -22,6 +22,9 @@
     <Filter Include="Objects">
       <UniqueIdentifier>{94411b81-2732-4a0c-b3cc-73a54e3f74f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Textures">
+      <UniqueIdentifier>{ca46c17a-bded-4d60-a013-d499f219d1ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -160,5 +163,16 @@
     <FxCompile Include="DebugUVsPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Textures\brick_texture.jfif">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\sand_texture.jpg">
+      <Filter>Textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>
