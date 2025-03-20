@@ -46,21 +46,8 @@ std::shared_ptr<Material> GameEntity::GetMaterial()
 // Draw Method
 void GameEntity::Draw(std::shared_ptr<Camera> camera)
 {
-	// Constant Buffer Business
-	std::shared_ptr<SimpleVertexShader> vs = material->GetVertexShader();
-	vs->SetMatrix4x4("world", transform->GetWorldMatrix());
-	vs->SetMatrix4x4("view", camera->GetView());
-	vs->SetMatrix4x4("projection", camera->GetProjection());
-	vs->CopyAllBufferData();
-
-	// More constant buffer business with the pixel shader this time
-	std::shared_ptr<SimplePixelShader> ps = material->GetPixelShader();
-	ps->SetFloat4("colorTint", material->GetColorTint());
-	ps->CopyAllBufferData();
-
-	// Activate our shaders
-	material->GetVertexShader()->SetShader();
-	material->GetPixelShader()->SetShader();
+	// Prepare the material
+	material->PrepareMaterial(transform, camera);
 
 	// Draw the mesh using m the mesh draw function
 	mesh->Draw();

@@ -131,9 +131,9 @@ void Game::CreateGeometry()
 
 	// Load some textures
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> brickSRV;
-	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/brick_texture.jpg"), nullptr, brickSRV.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/brick_texture.jpg").c_str(), nullptr, brickSRV.GetAddressOf());
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sandSRV;
-	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/sand_texture.jpg"), nullptr, sandSRV.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/sand_texture.jpg").c_str(), nullptr, sandSRV.GetAddressOf());
 
 	// Sampler State stuff
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
@@ -153,6 +153,11 @@ void Game::CreateGeometry()
 	// Create our materials
 	std::shared_ptr<Material> matBricks = std::make_shared<Material>(white, vertexShader, pixelShader);
 	matBricks->AddSampler("BasicSampler", samplerState);
+	matBricks->AddTextureSRV("SurfaceTexture", brickSRV);
+
+	std::shared_ptr<Material> matSand = std::make_shared<Material>(white, vertexShader, pixelShader);
+	matSand->AddSampler("BasicSampler", samplerState);
+	matSand->AddTextureSRV("SurfaceTexture", sandSRV);
 
 	std::shared_ptr<Material> matRed = std::make_shared<Material>(red, vertexShader, pixelShader);
 	std::shared_ptr<Material> matGreen = std::make_shared<Material>(green, vertexShader, pixelShader);
@@ -173,13 +178,13 @@ void Game::CreateGeometry()
 	std::shared_ptr<Mesh> torusMesh = std::make_shared<Mesh>("Torus", FixPath("../../Assets/torus.obj").c_str());
 
 	// Create the GameEntities
-	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, customMat);
-	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, customMat);
-	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, customMat);
-	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, customMat);
-	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, customMat);
-	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, customMat);
-	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, customMat);
+	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, matBricks);
+	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, matBricks);
+	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, matBricks);
+	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, matBricks);
+	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, matBricks);
+	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, matBricks);
+	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, matBricks);
 
 	// Add the entities to the entities list
 	entities.push_back(gameCube);
@@ -208,23 +213,14 @@ void Game::CreateGeometry()
 	{
 		// Create GameEntity with the UV material and the list item's mesh
 		std::shared_ptr<Mesh> mesh = entities[i]->GetMesh();
-		std::shared_ptr<GameEntity> gameUV = std::make_shared<GameEntity>(mesh, uvMat);
+		std::shared_ptr<GameEntity> gameSand = std::make_shared<GameEntity>(mesh, matSand);
 
 		// Set up its transform to be the same but offset in the y
-		gameUV->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
-		gameUV->GetTransform()->MoveAbsolute(0, -3.0f, 0);
-
-		// Do the same but for an entity with the normal material
-		std::shared_ptr<GameEntity> gameNormal = std::make_shared<GameEntity>(mesh, normalMat);
-
-		// Set up its transform same as before
-		gameNormal->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
-		gameNormal->GetTransform()->MoveAbsolute(0, -6.0f, 0);
-		gameNormal->GetTransform()->Rotate(0, -4.0f, 0);	// Also rotate the normal ones to see better
+		gameSand->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
+		gameSand->GetTransform()->MoveAbsolute(0, -3.0f, 0);
 
 		// Put both the new entities in the list
-		entities.push_back(gameUV);
-		entities.push_back(gameNormal);
+		entities.push_back(gameSand);
 	}
 }
 
@@ -473,7 +469,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		if (cameras[i]->GetActive()) { currentCam = cameras[i]; }
 	}
 
-	// Draw the geomtry
+	// Draw the geometry
 	// Loop through game entities list to draw each
 	for (auto& e : entities)
 	{
