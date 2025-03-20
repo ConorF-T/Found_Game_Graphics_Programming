@@ -41,6 +41,7 @@ private:
 	// Vectors to hold our meshes and entities
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	std::vector<std::shared_ptr<GameEntity>> entities;
+	std::vector <std::shared_ptr<Material>> materials;
 
 	// Game Camera
 	std::vector<std::shared_ptr<Camera>> cameras;

@@ -34,6 +34,16 @@ DirectX::XMFLOAT2 Material::GetuvOffset()
 	return DirectX::XMFLOAT2();
 }
 
+std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>>& Material::GetTextureSRVs()
+{
+	return textureSRVs;
+}
+
+std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>>& Material::GetSamplers()
+{
+	return samplers;
+}
+
 
 // Setters
 void Material::SetColorTint(DirectX::XMFLOAT4 color) { this->colorTint = color; }

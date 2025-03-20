@@ -23,6 +23,8 @@ public:
 	std::shared_ptr<SimplePixelShader> GetPixelShader();
 	DirectX::XMFLOAT2 GetuvScale();
 	DirectX::XMFLOAT2 GetuvOffset();
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>>& GetTextureSRVs();
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>>& GetSamplers();
 
 	// Setters
 	void SetColorTint(DirectX::XMFLOAT4 color);

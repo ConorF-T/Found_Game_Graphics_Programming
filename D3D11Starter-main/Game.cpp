@@ -168,6 +168,9 @@ void Game::CreateGeometry()
 	matDirtBricks->AddTextureSRV("SurfaceTexture", brickSRV);
 	matDirtBricks->AddTextureSRV("DecalTexture", dirtSRV);
 
+	// Add materials to vector
+	materials.insert(materials.end(), { matBricks, matSand, matDirtBricks });
+
 	// Create our meshes with .obj files
 	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>("Cube", FixPath("../../Assets/cube.obj").c_str());
 	std::shared_ptr<Mesh> cylinderMesh = std::make_shared<Mesh>("Cylinder", FixPath("../../Assets/cylinder.obj").c_str());
@@ -414,6 +417,22 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 
 			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Materials"))
+		{
+			for (int m = 0; m < materials.size(); m++)
+			{
+				ImGui::PushID(materials[m].get());
+
+				if (ImGui::TreeNode("Material", "Material &d", m))
+				{
+					for (auto& voidPtr : materials[m]->GetTextureSRVs())
+					{
+						ImGui::Image(voidPtr.second.Get(), ImVec2(200, 200));
+					}
+				}
+			}
 		}
 	}
 	ImGui::End(); // Ends the current window
