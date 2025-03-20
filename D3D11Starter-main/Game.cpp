@@ -128,12 +128,16 @@ void Game::CreateGeometry()
 		Graphics::Device, Graphics::Context, FixPath(L"DebugNormalsPS.cso").c_str());
 	std::shared_ptr<SimplePixelShader> customPixelShader = std::make_shared<SimplePixelShader>(
 		Graphics::Device, Graphics::Context, FixPath(L"CustomPS.cso").c_str());
+	std::shared_ptr<SimplePixelShader> DecalPixelShader = std::make_shared<SimplePixelShader>(
+		Graphics::Device, Graphics::Context, FixPath(L"DecalPixelShader.cso").c_str());
 
 	// Load some textures
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> brickSRV;
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/brick_texture.jpg").c_str(), nullptr, brickSRV.GetAddressOf());
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sandSRV;
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/sand_texture.jpg").c_str(), nullptr, sandSRV.GetAddressOf());
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> dirtSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/dirt_texture.png").c_str(), nullptr, dirtSRV.GetAddressOf());
 
 	// Sampler State stuff
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
@@ -159,14 +163,10 @@ void Game::CreateGeometry()
 	matSand->AddSampler("BasicSampler", samplerState);
 	matSand->AddTextureSRV("SurfaceTexture", sandSRV);
 
-	std::shared_ptr<Material> matRed = std::make_shared<Material>(red, vertexShader, pixelShader);
-	std::shared_ptr<Material> matGreen = std::make_shared<Material>(green, vertexShader, pixelShader);
-	std::shared_ptr<Material> matBlue = std::make_shared<Material>(blue, vertexShader, pixelShader);
-	std::shared_ptr<Material> matWhite = std::make_shared<Material>(white, vertexShader, pixelShader);
-	std::shared_ptr<Material> matBlack = std::make_shared<Material>(black, vertexShader, pixelShader);
-	std::shared_ptr<Material> uvMat = std::make_shared<Material>(white, vertexShader, uvPixelShader);
-	std::shared_ptr<Material> normalMat = std::make_shared<Material>(white, vertexShader, normalPixelShader);
-	std::shared_ptr<Material> customMat = std::make_shared<Material>(white, vertexShader, customPixelShader);
+	std::shared_ptr<Material> matDirtBricks = std::make_shared<Material>(white, vertexShader, DecalPixelShader);
+	matDirtBricks->AddSampler("BasicSampler", samplerState);
+	matDirtBricks->AddTextureSRV("SurfaceTexture", brickSRV);
+	matDirtBricks->AddTextureSRV("DecalTexture", dirtSRV);
 
 	// Create our meshes with .obj files
 	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>("Cube", FixPath("../../Assets/cube.obj").c_str());
@@ -178,8 +178,8 @@ void Game::CreateGeometry()
 	std::shared_ptr<Mesh> torusMesh = std::make_shared<Mesh>("Torus", FixPath("../../Assets/torus.obj").c_str());
 
 	// Create the GameEntities
-	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, matBricks);
-	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, matBricks);
+	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, matDirtBricks);
+	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, matDirtBricks);
 	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, matBricks);
 	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, matBricks);
 	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, matBricks);
