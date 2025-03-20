@@ -425,14 +425,36 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				ImGui::PushID(materials[m].get());
 
-				if (ImGui::TreeNode("Material", "Material &d", m))
+				if (ImGui::TreeNode("Material", "Material %d", m))
 				{
-					for (auto& voidPtr : materials[m]->GetTextureSRVs())
+					XMFLOAT2 scale = materials[m]->GetuvScale();
+					if (ImGui::DragFloat2("UV Scale: ", &scale.x, 0.5f))
 					{
-						ImGui::Image(voidPtr.second.Get(), ImVec2(200, 200));
+						materials[m]->SetuvScale(scale);
 					}
+
+					ImGui::Spacing();
+
+					XMFLOAT2 offset = materials[m]->GetuvOffset();
+					if (ImGui::DragFloat2("UV Offset: ", &offset.x, 0.5f))
+					{
+						materials[m]->SetuvOffset(offset);
+					}
+
+					ImGui::Spacing();
+
+					XMFLOAT4 tint = materials[m]->GetColorTint();
+					if (ImGui::ColorEdit4("Color Tint", &tint.x))
+					{
+						materials[m]->SetColorTint(tint);
+					}
+
+					ImGui::TreePop();
 				}
+
+				ImGui::PopID();
 			}
+			ImGui::TreePop(); 
 		}
 	}
 	ImGui::End(); // Ends the current window
