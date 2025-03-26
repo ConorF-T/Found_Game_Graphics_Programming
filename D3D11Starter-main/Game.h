@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "SimpleShader.h"
 #include "Material.h"
+#include "Lights.h"
 
 class Game
 {
@@ -53,5 +54,8 @@ private:
 
 	// Ambient Color
 	DirectX::XMFLOAT4 ambientColor;
+
+	// Lights
+	Light directionalLight;
 };
 
