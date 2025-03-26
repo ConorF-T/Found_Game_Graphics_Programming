@@ -26,6 +26,8 @@ cbuffer ExternalData : register(b0)
 	float4 colorTint;
 	float2 uvScale;
 	float2 uvOffset;
+    float roughness;
+    float4 ambient;
 };
 
 // --------------------------------------------------------
@@ -46,6 +48,8 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float4 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv) * DecalTexture.Sample(BasicSampler, input.uv);
 
 	surfaceColor *= colorTint;
+	
+    surfaceColor *= ambient;
 
 	return float4(surfaceColor);
 }

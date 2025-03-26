@@ -50,5 +50,8 @@ private:
 
 	// Window Color
 	float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
+
+	// Ambient Color
+	DirectX::XMFLOAT4 ambientColor;
 };
 

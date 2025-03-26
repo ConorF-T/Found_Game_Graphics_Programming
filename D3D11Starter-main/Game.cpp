@@ -155,15 +155,15 @@ void Game::CreateGeometry()
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>> samplers;
 
 	// Create our materials
-	std::shared_ptr<Material> matBricks = std::make_shared<Material>(white, vertexShader, pixelShader);
+	std::shared_ptr<Material> matBricks = std::make_shared<Material>("Bricks", white, vertexShader, pixelShader, 0.9f);
 	matBricks->AddSampler("BasicSampler", samplerState);
 	matBricks->AddTextureSRV("SurfaceTexture", brickSRV);
 
-	std::shared_ptr<Material> matSand = std::make_shared<Material>(white, vertexShader, pixelShader);
+	std::shared_ptr<Material> matSand = std::make_shared<Material>("Sand", white, vertexShader, pixelShader, 0.75f);
 	matSand->AddSampler("BasicSampler", samplerState);
 	matSand->AddTextureSRV("SurfaceTexture", sandSRV);
 
-	std::shared_ptr<Material> matDirtBricks = std::make_shared<Material>(white, vertexShader, DecalPixelShader);
+	std::shared_ptr<Material> matDirtBricks = std::make_shared<Material>("Dirty Bricks", white, vertexShader, DecalPixelShader, 0.5f);
 	matDirtBricks->AddSampler("BasicSampler", samplerState);
 	matDirtBricks->AddTextureSRV("SurfaceTexture", brickSRV);
 	matDirtBricks->AddTextureSRV("DecalTexture", dirtSRV);
@@ -225,6 +225,9 @@ void Game::CreateGeometry()
 		// Put both the new entities in the list
 		entities.push_back(gameSand);
 	}
+
+	// Create our Ambient Color
+	ambientColor = XMFLOAT4(0.0, 0.1, 0.0, 1.0);
 }
 
 
@@ -514,6 +517,10 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Loop through game entities list to draw each
 	for (auto& e : entities)
 	{
+		// Lighting and shader stuff
+		e->GetMaterial()->GetPixelShader()->SetFloat4("ambient", ambientColor);
+
+		// Draw the entity
 		e->Draw(currentCam);
 	}
 

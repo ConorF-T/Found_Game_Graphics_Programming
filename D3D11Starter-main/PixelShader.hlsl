@@ -1,21 +1,5 @@
 
-// Struct representing the data we expect to receive from earlier pipeline stages
-// - Should match the output of our corresponding vertex shader
-// - The name of the struct itself is unimportant
-// - The variable names don't have to match other shaders (just the semantics)
-// - Each variable must have a semantic, which defines its usage
-struct VertexToPixel
-{
-	// Data type
-	//  |
-	//  |   Name          Semantic
-	//  |    |                |
-	//  v    v                v
-	float4 screenPosition	: SV_POSITION;
-	float4 color			: COLOR;
-	float2 uv				: TEXCOORD;		// UV map
-	float3 normal			: NORMAL;		// normal map
-};
+#include "ShaderIncludes.hlsli"
 
 Texture2D SurfaceTexture : register(t0); // "t" registers for textures
 SamplerState BasicSampler : register(s0); // "s" registers for samplers
@@ -23,9 +7,17 @@ SamplerState BasicSampler : register(s0); // "s" registers for samplers
 // Constant Buffer External Shader data
 cbuffer ExternalData : register(b0)
 {
+	// Lighting related
+    float4 ambient;
+	
+	// Material related
 	float4 colorTint;
 	float2 uvScale;
 	float2 uvOffset;
+    float roughness;
+	
+	// Camera related
+    float3 cameraPosition;
 };
 
 // --------------------------------------------------------
@@ -41,11 +33,15 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	// Set the uv adjusting with the scale and offset
 	input.uv = input.uv * uvScale + uvOffset;
+	
+    input.normal = normalize(input.normal);
 
 	// Create the surface color using the texture adjusted by the color tint
 	float4 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv);
-
 	surfaceColor *= colorTint;
+	
+	// Adjust surface color with the ambient color
+    surfaceColor *= ambient;
 
 	return float4(surfaceColor);
 }
