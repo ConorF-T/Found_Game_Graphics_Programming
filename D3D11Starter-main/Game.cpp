@@ -230,11 +230,41 @@ void Game::CreateGeometry()
 	ambientColor = XMFLOAT4(0.1, 0.1, 0.25, 1.0);
 
 	// Create Lights
-	directionalLight = {};
-	directionalLight.Type = LIGHT_TYPE_DIRECTIONAL;
-	directionalLight.Direction = XMFLOAT3(1, 0, 0);
-	directionalLight.Color = XMFLOAT3(1, 0, 0);
-	directionalLight.Intensity = 1.0f;
+	Light dLight1 = {};
+	dLight1.Type = LIGHT_TYPE_DIRECTIONAL;
+	dLight1.Direction = XMFLOAT3(1, 0, 0);
+	dLight1.Color = XMFLOAT3(1, 0, 0);
+	dLight1.Intensity = 1.0f;
+
+	Light dLight2 = {};
+	dLight2.Type = LIGHT_TYPE_DIRECTIONAL;
+	dLight2.Direction = XMFLOAT3(0, 1, 0);
+	dLight2.Color = XMFLOAT3(0, 1, 0);
+	dLight2.Intensity = 1.0f;
+
+	Light dLight3 = {};
+	dLight3.Type = LIGHT_TYPE_DIRECTIONAL;
+	dLight3.Direction = XMFLOAT3(0, 0, 1);
+	dLight3.Color = XMFLOAT3(0, 0, 1);
+	dLight3.Intensity = 1.0f;
+
+	Light dLight4 = {};
+	dLight4.Type = LIGHT_TYPE_DIRECTIONAL;
+	dLight4.Direction = XMFLOAT3(1, 1, 1);
+	dLight4.Color = XMFLOAT3(0, 0, 0);
+	dLight4.Intensity = 1.0f;
+
+	Light dLight5 = {};
+	dLight4.Type = LIGHT_TYPE_DIRECTIONAL;
+	dLight4.Direction = XMFLOAT3(1, 1, 1);
+	dLight4.Color = XMFLOAT3(0, 0, 0);
+	dLight4.Intensity = 1.0f;
+
+	lights.push_back(dLight1);
+	lights.push_back(dLight2);
+	lights.push_back(dLight3);
+	lights.push_back(dLight4);
+	lights.push_back(dLight5);
 }
 
 
@@ -527,10 +557,10 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Lighting and shader stuff
 		e->GetMaterial()->GetPixelShader()->SetFloat4("ambient", ambientColor);
 
-		e->GetMaterial()->GetPixelShader()->SetData(
-			"directionalLight", // The name of the (temporary) variable in the shader
-			&directionalLight, // The address of the data to set
-			sizeof(Light)); // The size of the data (the whole struct!) to set
+		std::shared_ptr<SimplePixelShader> ps = e->GetMaterial()->GetPixelShader();
+
+		ps->SetData("lights", &lights[0], sizeof(Light) * (int)lights.size());
+		ps->SetInt("lightCount", (int)lights.size());
 
 
 		// Draw the entity

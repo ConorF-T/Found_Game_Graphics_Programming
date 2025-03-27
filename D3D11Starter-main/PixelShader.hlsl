@@ -20,7 +20,8 @@ cbuffer ExternalData : register(b0)
     float3 cameraPosition;
 
 	// Light
-	Light directionalLight;
+	Light lights[5];
+	int  lightCount;
 };
 
 // --------------------------------------------------------
@@ -46,7 +47,14 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// Utalize the ambient color
 	float3 totalLight = surfaceColor * ambient;
 
-	totalLight = DirectionalLight(directionalLight, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+
+	//  Loop  through all  the lights and calculate the light
+	for (int i = 0; i < lightCount; i++)
+	{
+		Light l = lights[i];
+		l.Direction = normalize(l.Direction);
+		totalLight += DirectionalLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+	}
 
 	return float4(totalLight, 1);
 }

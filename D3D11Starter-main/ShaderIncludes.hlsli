@@ -48,7 +48,7 @@ struct Light
 float SpecularPhong(float3 cameraPosition, float3 worldPosition, float3 incomingLightDirection, float3 normal, float roughness)
 {
     // Calculate the specular exponent
-    float specExponent = (1.0f – roughness) * MAX_SPECULAR_EXPONENT;
+    float specExponent = (1.0f - roughness) * 260;
 
     // Calculate the view vector
     float3 viewVector = normalize(cameraPosition - worldPosition);
@@ -57,7 +57,7 @@ float SpecularPhong(float3 cameraPosition, float3 worldPosition, float3 incoming
     float3 reflection = reflect(incomingLightDirection, normal);
 
     // Calculate and return the specular value
-    return(pow(max(dot(reflection, viewVector), 0.0f), specExponent));
+    return (roughness == 1 ? 0.0f : pow(max(dot(reflection, viewVector), 0.0f), specExponent));
 }
 
 float3 DirectionalLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
@@ -69,7 +69,7 @@ float3 DirectionalLight(Light light, float3 normal, float4 surfaceColor, float3 
     float diffuseColor = saturate(dot(normal, directionToLight));
 
     // Calculate the specular
-    float specular = SpecularPhong(cameraPos, worldPos, directionToLight, normal);
+    float specular = SpecularPhong(cameraPos, worldPos, directionToLight, normal, roughness);
 
     return (diffuseColor * surfaceColor + specular) * light.Intensity * light.Color;
 }

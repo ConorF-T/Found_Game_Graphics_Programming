@@ -56,6 +56,6 @@ private:
 	DirectX::XMFLOAT4 ambientColor;
 
 	// Lights
-	Light directionalLight;
+	std::vector<Light>  lights;
 };
 
