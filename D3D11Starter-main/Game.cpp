@@ -248,23 +248,28 @@ void Game::CreateGeometry()
 	dLight3.Color = XMFLOAT3(0, 0, 1);
 	dLight3.Intensity = 1.0f;
 
-	Light dLight4 = {};
-	dLight4.Type = LIGHT_TYPE_DIRECTIONAL;
-	dLight4.Direction = XMFLOAT3(1, 1, 1);
-	dLight4.Color = XMFLOAT3(0, 0, 0);
-	dLight4.Intensity = 1.0f;
+	Light pointLight1 = {};
+	pointLight1.Type = LIGHT_TYPE_POINT;
+	pointLight1.Position = XMFLOAT3(1, 0, 0);
+	pointLight1.Color = XMFLOAT3(1, 1, 1);
+	pointLight1.Intensity = 0.5f;
+	pointLight1.Range = 5.0f;
 
-	Light dLight5 = {};
-	dLight4.Type = LIGHT_TYPE_DIRECTIONAL;
-	dLight4.Direction = XMFLOAT3(1, 1, 1);
-	dLight4.Color = XMFLOAT3(0, 0, 0);
-	dLight4.Intensity = 1.0f;
+	Light spotLight = {};
+	spotLight.Type = LIGHT_TYPE_POINT;
+	spotLight.Position = XMFLOAT3(-1, -1, 0);
+	spotLight.Direction = XMFLOAT3(0, -1, 0);
+	spotLight.Color = XMFLOAT3(1, 1, 1);
+	spotLight.Intensity = 0.5f;
+	spotLight.Range = 10.0f;
+	spotLight.SpotInnerAngle = XMConvertToRadians(20.0f);
+	spotLight.SpotOuterAngle = XMConvertToRadians(45.0f);
 
 	lights.push_back(dLight1);
 	lights.push_back(dLight2);
 	lights.push_back(dLight3);
-	lights.push_back(dLight4);
-	lights.push_back(dLight5);
+	lights.push_back(pointLight1);
+	lights.push_back(spotLight);
 }
 
 

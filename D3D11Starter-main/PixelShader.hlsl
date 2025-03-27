@@ -51,9 +51,25 @@ float4 main(VertexToPixel input) : SV_TARGET
 	//  Loop  through all  the lights and calculate the light
 	for (int i = 0; i < lightCount; i++)
 	{
+		// Get our light ready
 		Light l = lights[i];
 		l.Direction = normalize(l.Direction);
-		totalLight += DirectionalLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+
+		// Switch statement for the different types of light possible in the list
+		switch (l.Type)
+		{
+		case LIGHT_TYPE_DIRECTIONAL:
+			totalLight += DirectionalLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+			break;
+
+		case LIGHT_TYPE_POINT:
+			totalLight += PointLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+			break;
+		
+		case LIGHT_TYPE_SPOT:
+			totalLight += SpotLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+			break;
+		}
 	}
 
 	return float4(totalLight, 1);
