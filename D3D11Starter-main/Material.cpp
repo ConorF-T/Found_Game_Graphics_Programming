@@ -31,12 +31,12 @@ std::shared_ptr<SimplePixelShader> Material::GetPixelShader() { return pixelShad
 
 DirectX::XMFLOAT2 Material::GetuvScale()
 {
-	return DirectX::XMFLOAT2();
+	return uvScale;
 }
 
 DirectX::XMFLOAT2 Material::GetuvOffset()
 {
-	return DirectX::XMFLOAT2();
+	return uvOffset;
 }
 
 std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>>& Material::GetTextureSRVs()

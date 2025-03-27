@@ -227,13 +227,13 @@ void Game::CreateGeometry()
 	}
 
 	// Create our Ambient Color
-	ambientColor = XMFLOAT4(0.0, 0.1, 0.0, 1.0);
+	ambientColor = XMFLOAT4(0.1, 0.1, 0.25, 1.0);
 
 	// Create Lights
 	directionalLight = {};
 	directionalLight.Type = LIGHT_TYPE_DIRECTIONAL;
-	directionalLight.Direction = XMFLOAT3(-1, -1, 0);
-	directionalLight.Color = XMFLOAT3(0.2, 0.2, 1.0);
+	directionalLight.Direction = XMFLOAT3(1, 0, 0);
+	directionalLight.Color = XMFLOAT3(1, 0, 0);
 	directionalLight.Intensity = 1.0f;
 }
 

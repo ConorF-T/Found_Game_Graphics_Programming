@@ -43,8 +43,10 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float4 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv);
 	surfaceColor *= colorTint;
 	
-	// Adjust surface color with the ambient color
-    surfaceColor *= ambient;
+	// Utalize the ambient color
+	float3 totalLight = surfaceColor * ambient;
 
-	return float4(surfaceColor);
+	totalLight = DirectionalLight(directionalLight, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+
+	return float4(totalLight, 1);
 }

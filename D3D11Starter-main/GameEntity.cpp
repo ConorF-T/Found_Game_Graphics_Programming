@@ -23,6 +23,7 @@ void GameEntity::SetMesh(std::shared_ptr<Mesh> mesh)
 
 void GameEntity::SetMaterial(std::shared_ptr<Material> mat)
 {
+	material = mat;
 }
 
 
@@ -39,7 +40,7 @@ std::shared_ptr<Transform> GameEntity::GetTransform()
 
 std::shared_ptr<Material> GameEntity::GetMaterial()
 {
-	return std::shared_ptr<Material>();
+	return material;
 }
 
 
