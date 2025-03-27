@@ -18,6 +18,9 @@ cbuffer ExternalData : register(b0)
 	
 	// Camera related
     float3 cameraPosition;
+
+	// Light
+	Light directionalLight;
 };
 
 // --------------------------------------------------------

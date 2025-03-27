@@ -527,6 +527,10 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Lighting and shader stuff
 		e->GetMaterial()->GetPixelShader()->SetFloat4("ambient", ambientColor);
 
+		e->GetMaterial()->GetPixelShader()->SetData(
+			"directionalLight", // The name of the (temporary) variable in the shader
+			&directionalLight, // The address of the data to set
+			sizeof(Light)); // The size of the data (the whole struct!) to set
 
 
 		// Draw the entity
