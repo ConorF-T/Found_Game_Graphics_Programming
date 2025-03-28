@@ -501,6 +501,45 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 			ImGui::TreePop(); 
 		}
+		if (ImGui::TreeNode("Lights"))
+		{
+			// Editor for the ambient color
+			ImGui::Spacing();
+			ImGui::ColorEdit4("Ambient Light Color", &ambientColor.x);
+
+			// Loop to go through each light
+			for (int l = 0; l < lights.size(); l++)
+			{
+				// Name of the light
+				std::string name;
+
+				if (lights[l].Type == LIGHT_TYPE_DIRECTIONAL)
+				{
+					name = "Directional";
+				}
+				else if (lights[l].Type == LIGHT_TYPE_SPOT)
+				{
+					name = "Spot";
+				}
+				else if (lights[l].Type == LIGHT_TYPE_POINT)
+				{
+					name = "Point";
+				}
+
+				name += " Light %d";
+
+				// Editing for each individual light
+				ImGui::PushID(l);
+				if (ImGui::TreeNode("Light Node", name.c_str(), l))
+				{
+					// Build UI for one entity at a time
+					ImGui::ColorEdit3("Color", &lights[l].Color.x);
+					ImGui::TreePop();
+				}
+				ImGui::PopID();
+			}
+			ImGui::TreePop();
+		}
 	}
 	ImGui::End(); // Ends the current window
 
