@@ -1,0 +1,44 @@
+#pragma once
+
+#include "Mesh.h"
+#include "SimpleShader.h"
+#include "Camera.h"
+
+#include <memory>
+#include <wrl/client.h>
+
+class Sky
+{
+public:
+	Sky(
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerOptions,
+		std::shared_ptr<Mesh> mesh,
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeMap,
+		std::shared_ptr<SimplePixelShader> skyPS,
+		std::shared_ptr<SimpleVertexShader> skyVS
+	);
+
+	// Draw function
+	void Draw(std::shared_ptr<Camera> camera);
+
+	// Getter
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetCubeMap();
+
+private:
+	// Cube Map
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeMap;
+
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> skyDepthState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> skyRasterState;
+
+	// Shaders
+	std::shared_ptr<SimplePixelShader> skyPS;
+	std::shared_ptr<SimpleVertexShader> skyVS;
+
+	// Mesh
+	std::shared_ptr<Mesh> mesh;
+
+	// Sampler Options
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerOptions
+};
+

@@ -29,6 +29,17 @@ struct VertexToPixel
     float3 tangent          : TANGENT; // tangent
 };
 
+struct VertexToPixel_Sky
+{
+    // Data type
+    //  |
+    //  |   Name          Semantic
+    //  |    |                |
+    //  v    v                v
+    float4 screenPosition	: SV_POSITION;
+    float3 sampleDir		: DIRECTION;
+};
+
 #define LIGHT_TYPE_DIRECTIONAL	0
 #define LIGHT_TYPE_POINT		1
 #define LIGHT_TYPE_SPOT			2
