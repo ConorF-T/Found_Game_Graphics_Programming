@@ -28,6 +28,7 @@ public:
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>>& GetTextureSRVs();
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>>& GetSamplers();
 	float GetRoughness();
+	const char* GetName();
 
 	// Setters
 	void SetColorTint(DirectX::XMFLOAT4 color);

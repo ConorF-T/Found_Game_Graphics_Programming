@@ -51,7 +51,12 @@ std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>>& Mat
 
 float Material::GetRoughness()
 {
-	return 0.0f;
+	return roughness;
+}
+
+const char* Material::GetName()
+{
+	return name;
 }
 
 

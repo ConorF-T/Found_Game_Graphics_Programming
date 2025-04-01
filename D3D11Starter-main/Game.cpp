@@ -130,7 +130,7 @@ void Game::CreateGeometry()
 		Graphics::Device, Graphics::Context, FixPath(L"CustomPS.cso").c_str());
 	std::shared_ptr<SimplePixelShader> DecalPixelShader = std::make_shared<SimplePixelShader>(	// Shader with 2 layered textures
 		Graphics::Device, Graphics::Context, FixPath(L"DecalPixelShader.cso").c_str());
-	std::shared_ptr<SimplePixelShader> NormalMappingPS = std::make_shared<SimplePixelShader>(	// Pixel Shader with normal mapping
+	std::shared_ptr<SimplePixelShader> normalMappingPS = std::make_shared<SimplePixelShader>(	// Pixel Shader with normal mapping
 		Graphics::Device, Graphics::Context, FixPath(L"NormalMappingPS.cso").c_str());
 
 	// Load some textures
@@ -140,6 +140,21 @@ void Game::CreateGeometry()
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/sand_texture.jpg").c_str(), nullptr, sandSRV.GetAddressOf());
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> dirtSRV;
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/dirt_texture.png").c_str(), nullptr, dirtSRV.GetAddressOf());
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cobbleSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/cobblestone.png").c_str(), nullptr, cobbleSRV.GetAddressOf());
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cushionSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/cushion.png").c_str(), nullptr, cushionSRV.GetAddressOf());
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> rockSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/rock.png").c_str(), nullptr, rockSRV.GetAddressOf());
+
+	// Normal Maps
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cobbleNormalsSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/cobblestone_normals.png").c_str(), nullptr, cobbleNormalsSRV.GetAddressOf());
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cushionNormalsSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, cushionNormalsSRV.GetAddressOf());
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> rockNormalsSRV;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, rockNormalsSRV.GetAddressOf());
 
 	// Sampler State stuff
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
@@ -170,8 +185,24 @@ void Game::CreateGeometry()
 	matDirtBricks->AddTextureSRV("SurfaceTexture", brickSRV);
 	matDirtBricks->AddTextureSRV("DecalTexture", dirtSRV);
 
+	// Materials with normal maps
+	std::shared_ptr<Material> cobbleMat = std::make_shared<Material>("Cobblestone", white, vertexShader, normalMappingPS, 0.7f);
+	cobbleMat->AddSampler("BasicSampler", samplerState);
+	cobbleMat->AddTextureSRV("SurfaceTexture", cobbleSRV);
+	cobbleMat->AddTextureSRV("NormalMap", cobbleNormalsSRV);
+
+	std::shared_ptr<Material> cushionMat = std::make_shared<Material>("Cushion", white, vertexShader, normalMappingPS, 0.1f);
+	cushionMat->AddSampler("BasicSampler", samplerState);
+	cushionMat->AddTextureSRV("SurfaceTexture", cushionSRV);
+	cushionMat->AddTextureSRV("NormalMap", cushionNormalsSRV);
+
+	std::shared_ptr<Material> rockMat = std::make_shared<Material>("Rock", white, vertexShader, normalMappingPS, 0.9f);
+	rockMat->AddSampler("BasicSampler", samplerState);
+	rockMat->AddTextureSRV("SurfaceTexture", rockSRV);
+	rockMat->AddTextureSRV("NormalMap", rockNormalsSRV);
+
 	// Add materials to vector
-	materials.insert(materials.end(), { matBricks, matSand, matDirtBricks });
+	materials.insert(materials.end(), { matBricks, matSand, matDirtBricks, cobbleMat, cushionMat, rockMat });
 
 	// Create our meshes with .obj files
 	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>("Cube", FixPath("../../Assets/cube.obj").c_str());
@@ -183,13 +214,13 @@ void Game::CreateGeometry()
 	std::shared_ptr<Mesh> torusMesh = std::make_shared<Mesh>("Torus", FixPath("../../Assets/torus.obj").c_str());
 
 	// Create the GameEntities
-	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, matDirtBricks);
-	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, matDirtBricks);
-	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, matBricks);
-	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, matBricks);
-	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, matBricks);
-	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, matBricks);
-	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, matBricks);
+	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, cobbleMat);
+	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, cobbleMat);
+	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, cobbleMat);
+	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, cobbleMat);
+	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, cobbleMat);
+	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, cobbleMat);
+	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, cobbleMat);
 
 	// Add the entities to the entities list
 	entities.push_back(gameCube);
@@ -218,14 +249,14 @@ void Game::CreateGeometry()
 	{
 		// Create GameEntity with the UV material and the list item's mesh
 		std::shared_ptr<Mesh> mesh = entities[i]->GetMesh();
-		std::shared_ptr<GameEntity> gameSand = std::make_shared<GameEntity>(mesh, matSand);
+		std::shared_ptr<GameEntity> gameCushion = std::make_shared<GameEntity>(mesh, cushionMat);
 
 		// Set up its transform to be the same but offset in the y
-		gameSand->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
-		gameSand->GetTransform()->MoveAbsolute(0, -3.0f, 0);
+		gameCushion->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
+		gameCushion->GetTransform()->MoveAbsolute(0, -3.0f, 0);
 
 		// Put both the new entities in the list
-		entities.push_back(gameSand);
+		entities.push_back(gameCushion);
 	}
 
 	// Create our Ambient Color
@@ -235,25 +266,25 @@ void Game::CreateGeometry()
 	Light dLight1 = {};
 	dLight1.Type = LIGHT_TYPE_DIRECTIONAL;
 	dLight1.Direction = XMFLOAT3(1, 0, 0);
-	dLight1.Color = XMFLOAT3(1, 0, 0);
+	dLight1.Color = XMFLOAT3(1, 1, 1);
 	dLight1.Intensity = 1.0f;
 
 	Light dLight2 = {};
 	dLight2.Type = LIGHT_TYPE_DIRECTIONAL;
 	dLight2.Direction = XMFLOAT3(0, 1, 0);
-	dLight2.Color = XMFLOAT3(0, 1, 0);
+	dLight2.Color = XMFLOAT3(1, 1, 1);
 	dLight2.Intensity = 1.0f;
 
 	Light dLight3 = {};
 	dLight3.Type = LIGHT_TYPE_DIRECTIONAL;
 	dLight3.Direction = XMFLOAT3(0, 0, 1);
-	dLight3.Color = XMFLOAT3(0, 0, 1);
+	dLight3.Color = XMFLOAT3(1, 1, 1);
 	dLight3.Intensity = 1.0f;
 
 	Light pointLight1 = {};
 	pointLight1.Type = LIGHT_TYPE_POINT;
 	pointLight1.Position = XMFLOAT3(1, 0, 0);
-	pointLight1.Color = XMFLOAT3(1, 1, 1);
+	pointLight1.Color = XMFLOAT3(1, 0, 0);
 	pointLight1.Intensity = 0.5f;
 	pointLight1.Range = 5.0f;
 
@@ -261,7 +292,7 @@ void Game::CreateGeometry()
 	spotLight.Type = LIGHT_TYPE_POINT;
 	spotLight.Position = XMFLOAT3(-1, -1, 0);
 	spotLight.Direction = XMFLOAT3(0, -1, 0);
-	spotLight.Color = XMFLOAT3(1, 1, 1);
+	spotLight.Color = XMFLOAT3(0, 0, 1);
 	spotLight.Intensity = 0.5f;
 	spotLight.Range = 10.0f;
 	spotLight.SpotInnerAngle = XMConvertToRadians(20.0f);
@@ -472,7 +503,7 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				ImGui::PushID(materials[m].get());
 
-				if (ImGui::TreeNode("Material", "Material %d", m))
+				if (ImGui::TreeNode("Material", "Material %s", materials[m]->GetName()))
 				{
 					XMFLOAT2 scale = materials[m]->GetuvScale();
 					if (ImGui::DragFloat2("UV Scale: ", &scale.x, 0.5f))
