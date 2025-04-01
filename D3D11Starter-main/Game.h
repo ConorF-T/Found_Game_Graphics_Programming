@@ -9,6 +9,7 @@
 #include "SimpleShader.h"
 #include "Material.h"
 #include "Lights.h"
+#include "Sky.h"
 
 class Game
 {
@@ -57,5 +58,8 @@ private:
 
 	// Lights
 	std::vector<Light>  lights;
+
+	// Sky box
+	std::shared_ptr<Sky> sky;
 };
 

@@ -13,9 +13,14 @@ public:
 	Sky(
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerOptions,
 		std::shared_ptr<Mesh> mesh,
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeMap,
 		std::shared_ptr<SimplePixelShader> skyPS,
-		std::shared_ptr<SimpleVertexShader> skyVS
+		std::shared_ptr<SimpleVertexShader> skyVS,
+		const wchar_t* right,
+		const wchar_t* left,
+		const wchar_t* up,
+		const wchar_t* down,
+		const wchar_t* front,
+		const wchar_t* back
 	);
 
 	// Draw function
@@ -39,6 +44,15 @@ private:
 	std::shared_ptr<Mesh> mesh;
 
 	// Sampler Options
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerOptions
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerOptions;
+
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateCubemap(
+		const wchar_t* right,
+		const wchar_t* left,
+		const wchar_t* up,
+		const wchar_t* down,
+		const wchar_t* front,
+		const wchar_t* back);
 };
 

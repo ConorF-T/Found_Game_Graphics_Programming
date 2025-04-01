@@ -269,6 +269,12 @@
     <None Include="ShaderIncludes.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Planet\back.png" />
+    <Image Include="Assets\Planet\down.png" />
+    <Image Include="Assets\Planet\front.png" />
+    <Image Include="Assets\Planet\left.png" />
+    <Image Include="Assets\Planet\right.png" />
+    <Image Include="Assets\Planet\up.png" />
     <Image Include="Assets\Textures\brick_texture.jpg" />
     <Image Include="Assets\Textures\cobblestone.png" />
     <Image Include="Assets\Textures\cobblestone_normals.png" />

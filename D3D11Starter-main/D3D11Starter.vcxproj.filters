@@ -25,6 +25,9 @@
     <Filter Include="Textures">
       <UniqueIdentifier>{ca46c17a-bded-4d60-a013-d499f219d1ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Skies">
+      <UniqueIdentifier>{f015a415-b98a-4ce8-9875-8135447e0c5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -217,6 +220,24 @@
     </Image>
     <Image Include="Assets\Textures\flat_normals.png">
       <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Planet\back.png">
+      <Filter>Skies</Filter>
+    </Image>
+    <Image Include="Assets\Planet\down.png">
+      <Filter>Skies</Filter>
+    </Image>
+    <Image Include="Assets\Planet\front.png">
+      <Filter>Skies</Filter>
+    </Image>
+    <Image Include="Assets\Planet\left.png">
+      <Filter>Skies</Filter>
+    </Image>
+    <Image Include="Assets\Planet\right.png">
+      <Filter>Skies</Filter>
+    </Image>
+    <Image Include="Assets\Planet\up.png">
+      <Filter>Skies</Filter>
     </Image>
   </ItemGroup>
 </Project>

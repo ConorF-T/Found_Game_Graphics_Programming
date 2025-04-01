@@ -132,6 +132,10 @@ void Game::CreateGeometry()
 		Graphics::Device, Graphics::Context, FixPath(L"DecalPixelShader.cso").c_str());
 	std::shared_ptr<SimplePixelShader> normalMappingPS = std::make_shared<SimplePixelShader>(	// Pixel Shader with normal mapping
 		Graphics::Device, Graphics::Context, FixPath(L"NormalMappingPS.cso").c_str());
+	std::shared_ptr<SimplePixelShader> skyPixelShader = std::make_shared<SimplePixelShader>(	// Pixel shader for the skybox
+		Graphics::Device, Graphics::Context, FixPath(L"SkyPixelShader.cso").c_str());
+	std::shared_ptr<SimpleVertexShader> skyVertexShader = std::make_shared<SimpleVertexShader>(		// Vertex shader for the skybox
+		Graphics::Device, Graphics::Context, FixPath(L"SkyVertexShader.cso").c_str());
 
 	// Load some textures
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> brickSRV;
@@ -303,6 +307,19 @@ void Game::CreateGeometry()
 	lights.push_back(dLight3);
 	lights.push_back(pointLight1);
 	lights.push_back(spotLight);
+
+	// Create our skybox
+	sky = std::make_shared<Sky>(
+		samplerState,
+		cubeMesh,
+
+		FixPath(L"Assets/Skies/right.png").c_str(),
+		FixPath(L"Assets/Skies/left.png").c_str(),
+		FixPath(L"Assets/Skies/up.png").c_str(),
+		FixPath(L"Assets/Skies/down.png").c_str(),
+		FixPath(L"Assets/Skies/front.png").c_str(),
+		FixPath(L"Assets/Skies/back.png").c_str()
+		);
 }
 
 
@@ -643,6 +660,9 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Draw the entity
 		e->Draw(currentCam);
 	}
+
+	// Draw the skybox after everything else
+	sky->Draw(currentCam);
 
 	// Frame END
 	// - These should happen exactly ONCE PER FRAME
