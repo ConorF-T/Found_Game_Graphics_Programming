@@ -23,6 +23,7 @@ public:
 	const char* GetName();
 	void Draw();
 	void CreateBuffers(Vertex* verts, size_t numVertices, unsigned int* indices, size_t numIndices);
+	void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices);
 
 private:
 	// Buffers for geometric data

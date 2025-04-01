@@ -146,6 +146,9 @@
     <ClInclude Include="SimpleShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Lights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -163,15 +166,44 @@
     <FxCompile Include="DebugUVsPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="DecalPixelShader.hlsl" />
+    <FxCompile Include="NormalMappingPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="ShaderIncludes.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\sand_texture.jpg">
       <Filter>Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\brick_texture.jpg">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\dirt_texture.png">
+      <Filter>Shaders</Filter>
+    </Image>
+    <Image Include="Assets\Textures\cobblestone.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\cobblestone_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\cushion.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\cushion_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\rock.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\rock_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\flat_normals.png">
       <Filter>Textures</Filter>
     </Image>
   </ItemGroup>

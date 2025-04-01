@@ -11,6 +11,7 @@ struct VertexShaderInput
     float3 localPosition    : POSITION; // XYZ position
     float2 uv               : TEXCOORD; // UV map
     float3 normal           : NORMAL; // Normal map
+    float3 tangent          : TANGENT; // tangent
 };
 
 struct VertexToPixel
@@ -25,6 +26,7 @@ struct VertexToPixel
     float2 uv               : TEXCOORD; // UV map
     float3 normal           : NORMAL; // normal map
     float3 worldPosition    : POSITION; // world position
+    float3 tangent          : TANGENT; // tangent
 };
 
 #define LIGHT_TYPE_DIRECTIONAL	0

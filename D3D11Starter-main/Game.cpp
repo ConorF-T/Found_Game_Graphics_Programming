@@ -118,9 +118,9 @@ void Game::CreateGeometry()
 	XMFLOAT4 black = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Load our shaders
-	std::shared_ptr<SimpleVertexShader> vertexShader = std::make_shared<SimpleVertexShader>(
+	std::shared_ptr<SimpleVertexShader> vertexShader = std::make_shared<SimpleVertexShader>(	// Basic Vertex Shader
 		Graphics::Device, Graphics::Context, FixPath(L"VertexShader.cso").c_str());
-	std::shared_ptr<SimplePixelShader> pixelShader = std::make_shared<SimplePixelShader>(
+	std::shared_ptr<SimplePixelShader> pixelShader = std::make_shared<SimplePixelShader>(	// Basic Pixel Shader
 		Graphics::Device, Graphics::Context, FixPath(L"PixelShader.cso").c_str());
 	std::shared_ptr<SimplePixelShader> uvPixelShader = std::make_shared<SimplePixelShader>(
 		Graphics::Device, Graphics::Context, FixPath(L"DebugUVsPS.cso").c_str());
@@ -128,8 +128,10 @@ void Game::CreateGeometry()
 		Graphics::Device, Graphics::Context, FixPath(L"DebugNormalsPS.cso").c_str());
 	std::shared_ptr<SimplePixelShader> customPixelShader = std::make_shared<SimplePixelShader>(
 		Graphics::Device, Graphics::Context, FixPath(L"CustomPS.cso").c_str());
-	std::shared_ptr<SimplePixelShader> DecalPixelShader = std::make_shared<SimplePixelShader>(
+	std::shared_ptr<SimplePixelShader> DecalPixelShader = std::make_shared<SimplePixelShader>(	// Shader with 2 layered textures
 		Graphics::Device, Graphics::Context, FixPath(L"DecalPixelShader.cso").c_str());
+	std::shared_ptr<SimplePixelShader> NormalMappingPS = std::make_shared<SimplePixelShader>(	// Pixel Shader with normal mapping
+		Graphics::Device, Graphics::Context, FixPath(L"NormalMappingPS.cso").c_str());
 
 	// Load some textures
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> brickSRV;
