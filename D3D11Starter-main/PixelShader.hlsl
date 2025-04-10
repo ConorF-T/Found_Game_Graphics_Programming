@@ -41,7 +41,7 @@ float4 main(VertexToPixel input) : SV_TARGET
     input.normal = normalize(input.normal);
 
 	// Create the surface color using the texture adjusted by the color tint
-	float4 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv);
+	float4 surfaceColor = pow( SurfaceTexture.Sample(BasicSampler, input.uv), 2.2f );
 	surfaceColor *= colorTint;
 	
 	// Utalize the ambient color
@@ -72,5 +72,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 		}
 	}
 
-	return float4(totalLight, 1);
+	return float4(pow(totalLight, 1.0f / 2.2f), 1);
 }

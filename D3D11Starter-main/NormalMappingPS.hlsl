@@ -19,10 +19,13 @@ cbuffer ExternalData : register(b0)
 	int  lightCount;
 }
 
-Texture2D SurfaceTexture	: register(t0); // "t" registers for textures
+// Texture business
+Texture2D Albedo			: register(t0);
 Texture2D NormalMap			: register(t1);
+Texture2D RoughnessMap		: register(t2);
+Texture2D MetalnessMap		: register(t3);
+SamplerState BasicSampler	: register(s0);
 
-SamplerState BasicSampler	: register(s0); // "s" registers for samplers
 
 // --------------------------------------------------------
 // The entry point (main method) for our pixel shader
@@ -59,12 +62,23 @@ float4 main(VertexToPixel input) : SV_TARGET
 	input.normal = normalize(input.normal);
 
 	// Create the surface color using the texture adjusted by the color tint
-	float4 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv);
+	float4 surfaceColor = pow( Albedo.Sample(BasicSampler, input.uv), 2.2f);
 	surfaceColor *= colorTint;
 
 	// Utalize the ambient color
 	float3 totalLight = surfaceColor * ambient;
 
+	// Grab the roughness from the roughness map's red channel
+	float roughness = RoughnessMap.Sample(SamplerOptions, input.uv).r;
+
+	// Grab the metalness from the metal map's red channel
+	float metalness = MetalnessMap.Sample(SamplerOptions, input.uv).r;
+
+	// Specular color determination -----------------
+	// Assume albedo texture is actually holding specular color where metalness == 1
+	// Note the use of lerp here - metal is generally 0 or 1, but might be in between
+	// because of linear texture sampling, so we lerp the specular color to match
+	float3 specularColor = lerp(F0_NON_METAL, albedoColor.rgb, metalness);
 
 	//  Loop  through all  the lights and calculate the light
 	for (int i = 0; i < lightCount; i++)
@@ -77,18 +91,18 @@ float4 main(VertexToPixel input) : SV_TARGET
 		switch (l.Type)
 		{
 		case LIGHT_TYPE_DIRECTIONAL:
-			totalLight += DirectionalLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+			totalLight += DirectionalLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness);
 			break;
 
 		case LIGHT_TYPE_POINT:
-			totalLight += PointLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+			totalLight += PointLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness);
 			break;
 
 		case LIGHT_TYPE_SPOT:
-			totalLight += SpotLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness);
+			totalLight += SpotLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness);
 			break;
 		}
 	}
 
-	return float4(totalLight, 1);
+	return float4(pow(totalLight, 1.0f / 2.2f), 1);
 }
