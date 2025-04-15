@@ -201,7 +201,7 @@ float Attenuate(Light light, float3 worldPos)
     return att * att;
 }
 
-float3 DirectionalLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness)
+float3 DirectionalLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
 {
     // Calculate normalized direction to this light
     float3 directionToLight = normalize(-light.Direction);
@@ -212,16 +212,33 @@ float3 DirectionalLight(Light light, float3 normal, float4 surfaceColor, float3 
     // Calculate the light amounts
     float diff = DiffusePBR(normal, directionToLight);
     float3 F;
-    float3 spec = MicrofacetBRDF(normal, directionToLight, toCam, roughness, specColor, F);
+    float3 spec = MicrofacetBRDF(normal, directionToLight, vectorToCam, roughness, specular, F);
 
     // Calculate diffuse with energy conservation, including cutting diffuse for metals
     float3 balancedDiff = DiffuseEnergyConserve(diff, F, metalness);
 
     // Combine the final diffuse and specular values for this light
-    return = (balancedDiff * surfaceColor + spec) * light.Intensity * light.Color;
+    return ( float4(balancedDiff, 1.0f) * surfaceColor, 1.0f + spec) * light.Intensity * light.Color;
 }
 
-float3 PointLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness)
+float3 DirectionalLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
+{
+    // Calculate normalized direction to this light
+    float3 directionToLight = normalize(-light.Direction);
+
+    // Get vector for the camera
+    float3 vectorToCam = normalize(cameraPos - worldPos);
+    
+    // Get diffusion
+    float diffusion = saturate(dot(normal, directionToLight));
+    
+    // Get specular
+    float specular = SpecularPhong(cameraPos, worldPos, directionToLight, normal, roughness);
+    
+    return (diffusion * surfaceColor + specular, 1.0f) * light.Intensity * light.Color;
+}
+
+float3 PointLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
 {
     // Get out vector for the position of the light
     float3 vectorToLight = normalize(light.Position - worldPos);
@@ -230,9 +247,9 @@ float3 PointLight(Light light, float3 normal, float4 surfaceColor, float3 camera
     float3 vectorToCam = normalize(cameraPos - worldPos);
 
     // Calculate the light amounts
-    float diff = DiffusePBR(normal, directionToLight);
+    float diff = DiffusePBR(normal, vectorToLight);
     float3 F;
-    float3 spec = MicrofacetBRDF(normal, directionToLight, toCam, roughness, specColor, F);
+    float3 spec = MicrofacetBRDF(normal, vectorToLight, vectorToCam, roughness, specular, F);
 
     // Calculate diffuse with energy conservation, including cutting diffuse for metals
     float3 balancedDiff = DiffuseEnergyConserve(diff, F, metalness);
@@ -240,10 +257,31 @@ float3 PointLight(Light light, float3 normal, float4 surfaceColor, float3 camera
     // Calculate the attenuation
     float attenuation = Attenuate(light, worldPos);
 
-    return (balancedDiff * surfaceColor + specular) * attenuation * light.Intensity * light.Color;
+    return (float4(balancedDiff, 1.0f) * surfaceColor, 1.0f + spec) * attenuation * light.Intensity * light.Color;
 }
 
-float3 SpotLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness)
+float3 PointLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
+{
+    // Get out vector for the position of the light
+    float3 vectorToLight = normalize(light.Position - worldPos);
+
+    // Get vector for the camera
+    float3 vectorToCam = normalize(cameraPos - worldPos);
+    
+    // Get attenuation
+    float dist = distance(light.Position, worldPos);
+    float attenuation = saturate(1.0f - (dist * dist / (light.Range * light.Range)));
+    
+    // Get specular
+    float specular = SpecularPhong(cameraPos, worldPos, vectorToLight, normal, roughness);
+    
+    // Get diffusion
+    float diffusion = saturate(dot(normal, vectorToLight));
+    
+    return (diffusion * surfaceColor + specular, 1.0f) * attenuation * light.Intensity * light.Color;
+}
+
+float3 SpotLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
 {
     // Get out vector for the position of the light
     float3 vectorToLight = normalize(light.Position - worldPos);
@@ -259,7 +297,26 @@ float3 SpotLight(Light light, float3 normal, float4 surfaceColor, float3 cameraP
     // Linear falloff over the range, clamp 0-1, apply to light calculation
     float spotTerm = saturate((cosOuter - pixelAngle) / falloffRange);
 
-    return PointLight(light, normal, surfaceColor, cameraPos, worldPos, roughness, metalness) * spotTerm;
+    return PointLightPBR(light, normal, surfaceColor, cameraPos, worldPos, roughness, metalness, specular) * spotTerm;
+}
+
+float3 SpotLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
+{
+    // Get out vector for the position of the light
+    float3 vectorToLight = normalize(light.Position - worldPos);
+
+    // Get cos(angle) between the pixel and the light's direction
+    float pixelAngle = saturate(dot(vectorToLight, light.Direction));
+
+    // Get the cosine of the angles and our outter range
+    float cosOuter = cos(light.SpotOuterAngle);
+    float cosInner = cos(light.SpotInnerAngle);
+    float falloffRange = cosOuter - cosInner;
+
+    // Linear falloff over the range, clamp 0-1, apply to light calculation
+    float spotTerm = saturate((cosOuter - pixelAngle) / falloffRange);
+
+    return PointLight(light, normal, surfaceColor, cameraPos, worldPos, roughness) * spotTerm;
 }
 
 

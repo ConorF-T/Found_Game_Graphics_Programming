@@ -14,7 +14,6 @@ public:
 		DirectX::XMFLOAT4 colorTint,
 		std::shared_ptr<SimpleVertexShader> vertexShader,
 		std::shared_ptr<SimplePixelShader> pixelShader,
-		float roughness,
 		DirectX::XMFLOAT2 uvScale = DirectX::XMFLOAT2(1, 1),
 		DirectX::XMFLOAT2 uvOffset = DirectX::XMFLOAT2(0, 0)
 		);
@@ -51,7 +50,6 @@ private:
 	DirectX::XMFLOAT2 uvScale;
 	DirectX::XMFLOAT2 uvOffset;
 	const char* name;
-	float roughness;
 
 	// Hash Tables
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> textureSRVs;

@@ -45,7 +45,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	surfaceColor *= colorTint;
 	
 	// Utalize the ambient color
-	float3 totalLight = surfaceColor * ambient;
+	float3 totalLight = surfaceColor.rgb * ambient;
 
 
 	//  Loop  through all  the lights and calculate the light

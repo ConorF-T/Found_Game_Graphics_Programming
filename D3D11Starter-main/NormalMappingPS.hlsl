@@ -65,20 +65,20 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float4 surfaceColor = pow( Albedo.Sample(BasicSampler, input.uv), 2.2f);
 	surfaceColor *= colorTint;
 
-	// Utalize the ambient color
-	float3 totalLight = surfaceColor * ambient;
-
 	// Grab the roughness from the roughness map's red channel
-	float roughness = RoughnessMap.Sample(SamplerOptions, input.uv).r;
+	float roughness = RoughnessMap.Sample(BasicSampler, input.uv).r;
 
 	// Grab the metalness from the metal map's red channel
-	float metalness = MetalnessMap.Sample(SamplerOptions, input.uv).r;
+	float metalness = MetalnessMap.Sample(BasicSampler, input.uv).r;
 
 	// Specular color determination -----------------
 	// Assume albedo texture is actually holding specular color where metalness == 1
 	// Note the use of lerp here - metal is generally 0 or 1, but might be in between
 	// because of linear texture sampling, so we lerp the specular color to match
-	float3 specularColor = lerp(F0_NON_METAL, albedoColor.rgb, metalness);
+	float3 specularColor = lerp(F0_NON_METAL, surfaceColor.rgb, metalness);
+
+	// Create our total light
+	float3 totalLight = surfaceColor.rgb;
 
 	//  Loop  through all  the lights and calculate the light
 	for (int i = 0; i < lightCount; i++)
@@ -91,15 +91,15 @@ float4 main(VertexToPixel input) : SV_TARGET
 		switch (l.Type)
 		{
 		case LIGHT_TYPE_DIRECTIONAL:
-			totalLight += DirectionalLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness);
+			totalLight += DirectionalLightPBR(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
 			break;
 
 		case LIGHT_TYPE_POINT:
-			totalLight += PointLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness);
+			totalLight += PointLightPBR(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
 			break;
 
 		case LIGHT_TYPE_SPOT:
-			totalLight += SpotLight(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness);
+			totalLight += SpotLightPBR(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
 			break;
 		}
 	}
