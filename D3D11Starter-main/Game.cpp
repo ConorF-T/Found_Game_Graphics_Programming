@@ -341,12 +341,12 @@ void Game::CreateGeometry()
 		cubeMesh,
 		skyPixelShader, 
 		skyVertexShader,
-		FixPath(L"Assets/Skies/right.png").c_str(),
-		FixPath(L"Assets/Skies/left.png").c_str(),
-		FixPath(L"Assets/Skies/up.png").c_str(),
-		FixPath(L"Assets/Skies/down.png").c_str(),
-		FixPath(L"Assets/Skies/front.png").c_str(),
-		FixPath(L"Assets/Skies/back.png").c_str()
+		FixPath("../../Assets/Planet/right.png").c_str(),
+		FixPath("../../Assets/Planet/left.png").c_str(),
+		FixPath("../..Assets/Planet/up.png").c_str(),
+		FixPath("../..Assets/Planet/down.png").c_str(),
+		FixPath("../..Assets/Planet/front.png").c_str(),
+		FixPath("../..Assets/Planet/back.png").c_str()
 		);
 }
 

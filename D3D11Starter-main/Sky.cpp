@@ -19,7 +19,6 @@ Sky::Sky(
 	:
 	samplerOptions(samplerOptions),
 	mesh(mesh),
-	cubeMap(cubeMap),
 	skyPS(skyPS),
 	skyVS(skyVS)
 {
