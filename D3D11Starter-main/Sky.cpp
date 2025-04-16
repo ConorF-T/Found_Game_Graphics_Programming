@@ -1,4 +1,9 @@
 #include "Sky.h"
+#include "Graphics.h"
+#include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
+
+using namespace DirectX;
 
 Sky::Sky(
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerOptions, 
@@ -14,7 +19,6 @@ Sky::Sky(
 	:
 	samplerOptions(samplerOptions),
 	mesh(mesh),
-	cubeMap(cubeMap),
 	skyPS(skyPS),
 	skyVS(skyVS)
 {

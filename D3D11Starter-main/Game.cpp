@@ -312,13 +312,14 @@ void Game::CreateGeometry()
 	sky = std::make_shared<Sky>(
 		samplerState,
 		cubeMesh,
-
-		FixPath(L"Assets/Skies/right.png").c_str(),
-		FixPath(L"Assets/Skies/left.png").c_str(),
-		FixPath(L"Assets/Skies/up.png").c_str(),
-		FixPath(L"Assets/Skies/down.png").c_str(),
-		FixPath(L"Assets/Skies/front.png").c_str(),
-		FixPath(L"Assets/Skies/back.png").c_str()
+		skyPixelShader,
+		skyVertexShader,
+		FixPath(L"../../Assets/Planet/right.png").c_str(),
+		FixPath(L"../../Assets/Planet/left.png").c_str(),
+		FixPath(L"../../Assets/Planet/up.png").c_str(),
+		FixPath(L"../../Assets/Planet/down.png").c_str(),
+		FixPath(L"../../Assets/Planet/front.png").c_str(),
+		FixPath(L"../../Assets/Planet/back.png").c_str()
 		);
 }
 
