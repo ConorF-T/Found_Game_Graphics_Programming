@@ -164,6 +164,12 @@ void Game::CreateGeometry()
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/paint_normals.png").c_str(), nullptr, paintNormal.GetAddressOf());
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Roughness/paint_roughness.png").c_str(), nullptr, paintRoughness.GetAddressOf());
 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> floorAlbedo, floorNormal, floorMetal, floorRoughness;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Albedos/floor_albedo.png").c_str(), nullptr, floorAlbedo.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Metal/floor_metal.png").c_str(), nullptr, floorMetal.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/floor_normals.png").c_str(), nullptr, floorNormal.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Roughness/floor_roughness.png").c_str(), nullptr, floorRoughness.GetAddressOf());
+
 	// Normal Maps
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cobbleNormalsSRV;
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/cobblestone_normals.png").c_str(), nullptr, cobbleNormalsSRV.GetAddressOf());
@@ -232,6 +238,14 @@ void Game::CreateGeometry()
 	paintMat->AddTextureSRV("RoughnessMap", paintRoughness);
 	paintMat->AddTextureSRV("MetalnessMap", paintMetal);
 
+	std::shared_ptr<Material> floorMat = std::make_shared <Material>("Floor", white, vertexShader, normalMappingPS);
+	floorMat->AddSampler("BasicSampler", samplerState);
+	floorMat->AddTextureSRV("Albedo", floorAlbedo);
+	floorMat->AddTextureSRV("NormalMap", floorNormal);
+	floorMat->AddTextureSRV("RoughnessMap", floorRoughness);
+	floorMat->AddTextureSRV("MetalnessMap", floorMetal);
+
+
 	// Add materials to vector
 	materials.insert(materials.end(), { matBricks, matSand, matDirtBricks, cobbleMat, cushionMat, rockMat, bronzeMat, paintMat});
 
@@ -280,14 +294,14 @@ void Game::CreateGeometry()
 	{
 		// Create GameEntity with the UV material and the list item's mesh
 		std::shared_ptr<Mesh> mesh = entities[i]->GetMesh();
-		std::shared_ptr<GameEntity> gamePaint = std::make_shared<GameEntity>(mesh, paintMat);
+		std::shared_ptr<GameEntity> gameAlt = std::make_shared<GameEntity>(mesh, floorMat);
 
 		// Set up its transform to be the same but offset in the y
-		gamePaint->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
-		gamePaint->GetTransform()->MoveAbsolute(0, -3.0f, 0);
+		gameAlt->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
+		gameAlt->GetTransform()->MoveAbsolute(0, -3.0f, 0);
 
 		// Put both the new entities in the list
-		entities.push_back(gamePaint);
+		entities.push_back(gameAlt);
 	}
 
 	// Create our Ambient Color
@@ -330,10 +344,10 @@ void Game::CreateGeometry()
 	spotLight.SpotOuterAngle = XMConvertToRadians(45.0f);
 
 	lights.push_back(dLight1);
-	lights.push_back(dLight2);
-	lights.push_back(dLight3);
+	//lights.push_back(dLight2);
+	//lights.push_back(dLight3);
 	lights.push_back(pointLight1);
-	lights.push_back(spotLight);
+	//lights.push_back(spotLight);
 
 	// Create our skybox
 	sky = std::make_shared<Sky>(

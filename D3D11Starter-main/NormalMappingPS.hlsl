@@ -104,5 +104,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 		}
 	}
 
-	return float4(pow(totalLight, 1.0f / 2.2f), 1);
+	//return float4(pow(totalLight, 1.0f / 2.2f), 1);
+    return float4(totalLight, 1);
+
 }

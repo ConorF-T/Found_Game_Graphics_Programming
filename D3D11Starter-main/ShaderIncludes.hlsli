@@ -218,7 +218,7 @@ float3 DirectionalLightPBR(Light light, float3 normal, float4 surfaceColor, floa
     float3 balancedDiff = DiffuseEnergyConserve(diff, F, metalness);
 
     // Combine the final diffuse and specular values for this light
-    return ( float4(balancedDiff, 1.0f) * surfaceColor, 1.0f + spec) * light.Intensity * light.Color;
+    return ( float4(balancedDiff, 0.0f) * surfaceColor, 0.0f + spec) * light.Intensity * light.Color;
 }
 
 float3 DirectionalLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
@@ -257,7 +257,7 @@ float3 PointLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cam
     // Calculate the attenuation
     float attenuation = Attenuate(light, worldPos);
 
-    return (float4(balancedDiff, 1.0f) * surfaceColor, 1.0f + spec) * attenuation * light.Intensity * light.Color;
+    return (float4(balancedDiff, 0.0f) * surfaceColor, 0.0f + spec) * attenuation * light.Intensity * light.Color;
 }
 
 float3 PointLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
@@ -278,7 +278,7 @@ float3 PointLight(Light light, float3 normal, float4 surfaceColor, float3 camera
     // Get diffusion
     float diffusion = saturate(dot(normal, vectorToLight));
     
-    return (diffusion * surfaceColor + specular, 1.0f) * attenuation * light.Intensity * light.Color;
+    return (diffusion * surfaceColor + specular, 0.0f) * attenuation * light.Intensity * light.Color;
 }
 
 float3 SpotLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
