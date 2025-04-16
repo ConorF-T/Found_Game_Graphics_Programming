@@ -152,13 +152,25 @@ void Game::CreateGeometry()
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> rockSRV;
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/rock.png").c_str(), nullptr, rockSRV.GetAddressOf());
 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> bronzeAlbedo, bronzeNormal, bronzeMetal, bronzeRoughness;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Albedos/bronze_albedo.png").c_str(), nullptr, bronzeAlbedo.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Metal/bronze_metal.png").c_str(), nullptr, bronzeMetal.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/bronze_normals.png").c_str(), nullptr, bronzeNormal.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Roughness/bronze_roughness.png").c_str(), nullptr, bronzeRoughness.GetAddressOf());
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> paintAlbedo, paintNormal, paintMetal, paintRoughness;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Albedos/paint_albedo.png").c_str(), nullptr, paintAlbedo.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Metal/paint_metal.png").c_str(), nullptr, paintMetal.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/paint_normals.png").c_str(), nullptr, paintNormal.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Roughness/paint_roughness.png").c_str(), nullptr, paintRoughness.GetAddressOf());
+
 	// Normal Maps
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cobbleNormalsSRV;
-	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/cobblestone_normals.png").c_str(), nullptr, cobbleNormalsSRV.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/cobblestone_normals.png").c_str(), nullptr, cobbleNormalsSRV.GetAddressOf());
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cushionNormalsSRV;
-	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, cushionNormalsSRV.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/cushion_normals.png").c_str(), nullptr, cushionNormalsSRV.GetAddressOf());
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> rockNormalsSRV;
-	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, rockNormalsSRV.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/rock_normals.png").c_str(), nullptr, rockNormalsSRV.GetAddressOf());
 
 	// Sampler State stuff
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
@@ -176,37 +188,52 @@ void Game::CreateGeometry()
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>> samplers;
 
 	// Create our materials
-	std::shared_ptr<Material> matBricks = std::make_shared<Material>("Bricks", white, vertexShader, pixelShader, 0.9f);
+	std::shared_ptr<Material> matBricks = std::make_shared<Material>("Bricks", white, vertexShader, pixelShader);
 	matBricks->AddSampler("BasicSampler", samplerState);
 	matBricks->AddTextureSRV("SurfaceTexture", brickSRV);
 
-	std::shared_ptr<Material> matSand = std::make_shared<Material>("Sand", white, vertexShader, pixelShader, 0.75f);
+	std::shared_ptr<Material> matSand = std::make_shared<Material>("Sand", white, vertexShader, pixelShader);
 	matSand->AddSampler("BasicSampler", samplerState);
 	matSand->AddTextureSRV("SurfaceTexture", sandSRV);
 
-	std::shared_ptr<Material> matDirtBricks = std::make_shared<Material>("Dirty Bricks", white, vertexShader, DecalPixelShader, 0.5f);
+	std::shared_ptr<Material> matDirtBricks = std::make_shared<Material>("Dirty Bricks", white, vertexShader, DecalPixelShader);
 	matDirtBricks->AddSampler("BasicSampler", samplerState);
 	matDirtBricks->AddTextureSRV("SurfaceTexture", brickSRV);
 	matDirtBricks->AddTextureSRV("DecalTexture", dirtSRV);
 
 	// Materials with normal maps
-	std::shared_ptr<Material> cobbleMat = std::make_shared<Material>("Cobblestone", white, vertexShader, normalMappingPS, 0.7f);
+	std::shared_ptr<Material> cobbleMat = std::make_shared<Material>("Cobblestone", white, vertexShader, normalMappingPS);
 	cobbleMat->AddSampler("BasicSampler", samplerState);
 	cobbleMat->AddTextureSRV("SurfaceTexture", cobbleSRV);
 	cobbleMat->AddTextureSRV("NormalMap", cobbleNormalsSRV);
 
-	std::shared_ptr<Material> cushionMat = std::make_shared<Material>("Cushion", white, vertexShader, normalMappingPS, 0.1f);
+	std::shared_ptr<Material> cushionMat = std::make_shared<Material>("Cushion", white, vertexShader, normalMappingPS);
 	cushionMat->AddSampler("BasicSampler", samplerState);
 	cushionMat->AddTextureSRV("SurfaceTexture", cushionSRV);
 	cushionMat->AddTextureSRV("NormalMap", cushionNormalsSRV);
 
-	std::shared_ptr<Material> rockMat = std::make_shared<Material>("Rock", white, vertexShader, normalMappingPS, 0.9f);
+	std::shared_ptr<Material> rockMat = std::make_shared<Material>("Rock", white, vertexShader, normalMappingPS);
 	rockMat->AddSampler("BasicSampler", samplerState);
 	rockMat->AddTextureSRV("SurfaceTexture", rockSRV);
 	rockMat->AddTextureSRV("NormalMap", rockNormalsSRV);
 
+	// PBR Materials
+	std::shared_ptr<Material> bronzeMat = std::make_shared <Material> ("Bronze", white, vertexShader, normalMappingPS);
+	bronzeMat->AddSampler("BasicSampler", samplerState);
+	bronzeMat->AddTextureSRV("Albedo", bronzeAlbedo);
+	bronzeMat->AddTextureSRV("NormalMap", bronzeNormal);
+	bronzeMat->AddTextureSRV("RoughnessMap", bronzeRoughness);
+	bronzeMat->AddTextureSRV("MetalnessMap", bronzeMetal);
+
+	std::shared_ptr<Material> paintMat = std::make_shared <Material>("Paint", white, vertexShader, normalMappingPS);
+	paintMat->AddSampler("BasicSampler", samplerState);
+	paintMat->AddTextureSRV("Albedo", paintAlbedo);
+	paintMat->AddTextureSRV("NormalMap", paintNormal);
+	paintMat->AddTextureSRV("RoughnessMap", paintRoughness);
+	paintMat->AddTextureSRV("MetalnessMap", paintMetal);
+
 	// Add materials to vector
-	materials.insert(materials.end(), { matBricks, matSand, matDirtBricks, cobbleMat, cushionMat, rockMat });
+	materials.insert(materials.end(), { matBricks, matSand, matDirtBricks, cobbleMat, cushionMat, rockMat, bronzeMat, paintMat});
 
 	// Create our meshes with .obj files
 	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>("Cube", FixPath("../../Assets/cube.obj").c_str());
@@ -218,13 +245,13 @@ void Game::CreateGeometry()
 	std::shared_ptr<Mesh> torusMesh = std::make_shared<Mesh>("Torus", FixPath("../../Assets/torus.obj").c_str());
 
 	// Create the GameEntities
-	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, cobbleMat);
-	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, cobbleMat);
-	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, cobbleMat);
-	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, cobbleMat);
-	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, cobbleMat);
-	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, cobbleMat);
-	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, cobbleMat);
+	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, bronzeMat);
+	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, bronzeMat);
+	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, bronzeMat);
+	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, bronzeMat);
+	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, bronzeMat);
+	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, bronzeMat);
+	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, bronzeMat);
 
 	// Add the entities to the entities list
 	entities.push_back(gameCube);
@@ -253,18 +280,18 @@ void Game::CreateGeometry()
 	{
 		// Create GameEntity with the UV material and the list item's mesh
 		std::shared_ptr<Mesh> mesh = entities[i]->GetMesh();
-		std::shared_ptr<GameEntity> gameCushion = std::make_shared<GameEntity>(mesh, cushionMat);
+		std::shared_ptr<GameEntity> gamePaint = std::make_shared<GameEntity>(mesh, paintMat);
 
 		// Set up its transform to be the same but offset in the y
-		gameCushion->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
-		gameCushion->GetTransform()->MoveAbsolute(0, -3.0f, 0);
+		gamePaint->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
+		gamePaint->GetTransform()->MoveAbsolute(0, -3.0f, 0);
 
 		// Put both the new entities in the list
-		entities.push_back(gameCushion);
+		entities.push_back(gamePaint);
 	}
 
 	// Create our Ambient Color
-	ambientColor = XMFLOAT4(0.1, 0.1, 0.25, 1.0);
+	ambientColor = XMFLOAT4(0.1f, 0.1f, 0.25f, 1.0f);
 
 	// Create Lights
 	Light dLight1 = {};

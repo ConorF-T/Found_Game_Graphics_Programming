@@ -6,7 +6,6 @@ Material::Material(
 	DirectX::XMFLOAT4 colorTint, 
 	std::shared_ptr<SimpleVertexShader> vertexShader, 
 	std::shared_ptr<SimplePixelShader> pixelShader, 
-	float roughness,
 	DirectX::XMFLOAT2 uvScale, 
 	DirectX::XMFLOAT2 uvOffset)
 	:
@@ -14,7 +13,6 @@ Material::Material(
 	colorTint(colorTint),
 	vertexShader(vertexShader),
 	pixelShader(pixelShader),
-	roughness(roughness),
 	uvScale(uvScale),
 	uvOffset(uvOffset)
 {
@@ -49,11 +47,6 @@ std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D11SamplerState>>& Mat
 	return samplers;
 }
 
-float Material::GetRoughness()
-{
-	return roughness;
-}
-
 const char* Material::GetName()
 {
 	return name;
@@ -70,8 +63,6 @@ void Material::SetPixelShader(std::shared_ptr<SimplePixelShader> ps) { this->pix
 void Material::SetuvScale(DirectX::XMFLOAT2 scale) { this->uvScale = scale; }
 
 void Material::SetuvOffset(DirectX::XMFLOAT2 offset) { this->uvOffset = offset; }
-
-void Material::SetRoughness(float r) { this->roughness = r; }
 
 
 // Texture Business
@@ -101,7 +92,6 @@ void Material::PrepareMaterial(std::shared_ptr<Transform> transform, std::shared
 	ps->SetFloat4("colorTint", colorTint);
 	ps->SetFloat2("uvScale", uvScale);
 	ps->SetFloat2("uvOffset", uvOffset);
-	ps->SetFloat("roughness", roughness);
 	ps->SetFloat3("cameraPosition", camera->GetTransform()->GetPosition());
 	ps->CopyAllBufferData();
 
