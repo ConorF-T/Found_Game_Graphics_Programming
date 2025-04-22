@@ -58,7 +58,7 @@ void Game::Initialize()
 
 	// Create our new camera
 	std::shared_ptr<Camera> gameCamera = std::make_shared<Camera>(
-		XMFLOAT3(0.0f, 0.0f, -5.0f),
+		XMFLOAT3(0.0f, 0.0f, 0.0f),
 		XM_PIDIV4,
 		Window::AspectRatio(),
 		1.0f,
@@ -136,8 +136,7 @@ void Game::CreateGeometry()
 		Graphics::Device, Graphics::Context, FixPath(L"SkyPixelShader.cso").c_str());
 	std::shared_ptr<SimpleVertexShader> skyVertexShader = std::make_shared<SimpleVertexShader>(		// Vertex shader for the skybox
 		Graphics::Device, Graphics::Context, FixPath(L"SkyVertexShader.cso").c_str());
-	std::shared_ptr<SimpleVertexShader> shadowVS = std::make_shared<SimpleVertexShader>(			// Vertex shader for shadow mapping
-		Graphics::Device, Graphics::Context, FixPath(L"ShadowMapVS.cso").c_str());
+	shadowVS = std::make_shared<SimpleVertexShader>( Graphics::Device, Graphics::Context, FixPath(L"ShadowMapVS.cso").c_str() ); // Vertex shader for shadow mapping
 
 	shadowMapResolution = 1024.0f;
 
@@ -230,6 +229,12 @@ void Game::CreateGeometry()
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/floor_normals.png").c_str(), nullptr, floorNormal.GetAddressOf());
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Roughness/floor_roughness.png").c_str(), nullptr, floorRoughness.GetAddressOf());
 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> woodAlbedo, woodNormal, woodMetal, woodRoughness;
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Albedos/wood_albedo.png").c_str(), nullptr,woodAlbedo.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Metal/wood_metal.png").c_str(), nullptr, woodMetal.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/wood_normals.png").c_str(), nullptr, woodNormal.GetAddressOf());
+	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Roughness/wood_roughness.png").c_str(), nullptr, woodRoughness.GetAddressOf());
+
 	// Normal Maps
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cobbleNormalsSRV;
 	CreateWICTextureFromFile(Graphics::Device.Get(), Graphics::Context.Get(), FixPath(L"../../Assets/Textures/Normals/cobblestone_normals.png").c_str(), nullptr, cobbleNormalsSRV.GetAddressOf());
@@ -305,9 +310,16 @@ void Game::CreateGeometry()
 	floorMat->AddTextureSRV("RoughnessMap", floorRoughness);
 	floorMat->AddTextureSRV("MetalnessMap", floorMetal);
 
+	std::shared_ptr<Material> woodMat = std::make_shared <Material>("Wood", white, vertexShader, normalMappingPS);
+	woodMat->AddSampler("BasicSampler", samplerState);
+	woodMat->AddTextureSRV("Albedo", woodAlbedo);
+	woodMat->AddTextureSRV("NormalMap", woodNormal);
+	woodMat->AddTextureSRV("RoughnessMap", woodRoughness);
+	woodMat->AddTextureSRV("MetalnessMap", woodMetal);
+
 
 	// Add materials to vector
-	materials.insert(materials.end(), { matBricks, matSand, matDirtBricks, cobbleMat, cushionMat, rockMat, bronzeMat, paintMat});
+	materials.insert(materials.end(), { matBricks, matSand, matDirtBricks, cobbleMat, cushionMat, rockMat, bronzeMat, paintMat, floorMat, woodMat});
 
 	// Create our meshes with .obj files
 	std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>("Cube", FixPath("../../Assets/cube.obj").c_str());
@@ -328,9 +340,9 @@ void Game::CreateGeometry()
 	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, bronzeMat);
 
 	// Create the floor to test shadows
-	std::shared_ptr<GameEntity> ground = std::make_shared<GameEntity>(cubeMesh, floorMat);
-	ground->GetTransform()->SetScale(100, 100, 100);
-	ground->GetTransform()->SetPosition(0, -105, 0);
+	std::shared_ptr<GameEntity> ground = std::make_shared<GameEntity>(cubeMesh, woodMat);
+	ground->GetTransform()->SetScale(25, 25, 25);
+	ground->GetTransform()->SetPosition(0, -32, 0);
 	entities.push_back(ground);
 
 	// Add the entities to the entities list
@@ -344,19 +356,19 @@ void Game::CreateGeometry()
 
 	// Adjust the transforms
 	float adjust = -9.0f;
-	for (int i = 0; i < entities.size(); i++)
+	for (int i = 1; i < entities.size(); i++)
 	{
 		entities[i]->GetTransform()->MoveAbsolute(adjust, 0.0f, 10.0f);
 		adjust += 3.0f;
 	}
 
 	// Adjusting the quads and torus to see them better
-	entities[3]->GetTransform()->Rotate(-1.0f, 0, 0);
-	entities[4]->GetTransform()->Rotate(1.0f, 0, 0);
-	entities[6]->GetTransform()->Rotate(1.5f, 0, 0);
+	entities[4]->GetTransform()->Rotate(-1.0f, 0, 0);
+	entities[5]->GetTransform()->Rotate(1.0f, 0, 0);
+	entities[7]->GetTransform()->Rotate(1.5f, 0, 0);
 
 	// Create the examples for the other shaders
-	for (int i = 0; i < 7; i++)
+	for (int i = 1; i < 8; i++)
 	{
 		// Create GameEntity with the UV material and the list item's mesh
 		std::shared_ptr<Mesh> mesh = entities[i]->GetMesh();
@@ -371,13 +383,13 @@ void Game::CreateGeometry()
 	}
 
 	// Create our Ambient Color
-	ambientColor = XMFLOAT4(0.1f, 0.1f, 0.25f, 1.0f);
+	ambientColor = XMFLOAT4(0, 0, 0, 1.0f);
 
 	// Create Lights
 	Light dLight1 = {};
 	dLight1.Type = LIGHT_TYPE_DIRECTIONAL;
 	dLight1.Direction = XMFLOAT3(1, 0, 0);
-	dLight1.Color = XMFLOAT3(1, 1, 1);
+	dLight1.Color = XMFLOAT3(1, 0, 0);
 	dLight1.Intensity = 1.0f;
 
 	Light dLight2 = {};
@@ -396,11 +408,11 @@ void Game::CreateGeometry()
 	pointLight1.Type = LIGHT_TYPE_POINT;
 	pointLight1.Position = XMFLOAT3(1, 0, 0);
 	pointLight1.Color = XMFLOAT3(1, 0, 0);
-	pointLight1.Intensity = 0.5f;
-	pointLight1.Range = 5.0f;
+	pointLight1.Intensity = 10.0f;
+	pointLight1.Range = 1.0f;
 
 	Light spotLight = {};
-	spotLight.Type = LIGHT_TYPE_POINT;
+	spotLight.Type = LIGHT_TYPE_SPOT;
 	spotLight.Position = XMFLOAT3(-1, -1, 0);
 	spotLight.Direction = XMFLOAT3(0, -1, 0);
 	spotLight.Color = XMFLOAT3(0, 0, 1);
@@ -410,9 +422,9 @@ void Game::CreateGeometry()
 	spotLight.SpotOuterAngle = XMConvertToRadians(45.0f);
 
 	lights.push_back(dLight1);
-	//lights.push_back(dLight2);
-	//lights.push_back(dLight3);
-	lights.push_back(pointLight1);
+	lights.push_back(dLight2);
+	lights.push_back(dLight3);
+	//lights.push_back(pointLight1);
 	//lights.push_back(spotLight);
 
 	// Create our light view matrix

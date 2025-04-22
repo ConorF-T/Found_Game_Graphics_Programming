@@ -65,7 +65,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	// Create the surface color using the texture adjusted by the color tint
 	float4 surfaceColor = pow( Albedo.Sample(BasicSampler, input.uv), 2.2f);
-	surfaceColor *= colorTint;
+	//surfaceColor *= colorTint;
 
 	// Grab the roughness from the roughness map's red channel
 	float roughness = RoughnessMap.Sample(BasicSampler, input.uv).r;
@@ -101,7 +101,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 		return float4(0, 0, 0, 1);
 
 	// Create our total light
-	float3 totalLight = surfaceColor.rgb;
+	float3 totalLight = surfaceColor.rgb * ambient;
 
 	//  Loop  through all  the lights and calculate the light
 	for (int i = 0; i < lightCount; i++)
@@ -114,24 +114,24 @@ float4 main(VertexToPixel input) : SV_TARGET
 		switch (l.Type)
 		{
 		case LIGHT_TYPE_DIRECTIONAL:
-			float3 lightResult = DirectionalLightPBR(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
+			//float3 lightResult = DirectionalLightPBR(l, input.normal, surfaceColor.rgb, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
 			// Apply the shadowing result
-			lightResult *= shadowAmount;
+			//lightResult *= shadowAmount;
 			// Add this light's result to the total light for this pixel
-			totalLight += lightResult;
+			//totalLight += lightResult;
+
+			totalLight += DirectionalLightPBR(l, input.normal, surfaceColor.rgb, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
 			break;
 
 		case LIGHT_TYPE_POINT:
-			totalLight += PointLightPBR(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
+			totalLight += PointLightPBR(l, input.normal, surfaceColor.rgb, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
 			break;
 
 		case LIGHT_TYPE_SPOT:
-			totalLight += SpotLightPBR(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
+			totalLight += SpotLightPBR(l, input.normal, surfaceColor.rgb, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
 			break;
 		}
 	}
 
-	//return float4(pow(totalLight, 1.0f / 2.2f), 1);
-    return float4(totalLight, 1);
-
+	return float4(pow(totalLight, 1.0f / 2.2f), 1);
 }

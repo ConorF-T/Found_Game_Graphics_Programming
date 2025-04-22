@@ -202,7 +202,7 @@ float Attenuate(Light light, float3 worldPos)
     return att * att;
 }
 
-float3 DirectionalLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
+float3 DirectionalLightPBR(Light light, float3 normal, float3 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
 {
     // Calculate normalized direction to this light
     float3 directionToLight = normalize(-light.Direction);
@@ -219,10 +219,10 @@ float3 DirectionalLightPBR(Light light, float3 normal, float4 surfaceColor, floa
     float3 balancedDiff = DiffuseEnergyConserve(diff, F, metalness);
 
     // Combine the final diffuse and specular values for this light
-    return ( float4(balancedDiff, 0.0f) * surfaceColor, 0.0f + spec) * light.Intensity * light.Color;
+    return (balancedDiff * surfaceColor + spec) * light.Intensity * light.Color;
 }
 
-float3 DirectionalLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
+float3 DirectionalLight(Light light, float3 normal, float3 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
 {
     // Calculate normalized direction to this light
     float3 directionToLight = normalize(-light.Direction);
@@ -236,10 +236,10 @@ float3 DirectionalLight(Light light, float3 normal, float4 surfaceColor, float3 
     // Get specular
     float specular = SpecularPhong(cameraPos, worldPos, directionToLight, normal, roughness);
     
-    return (diffusion * surfaceColor + specular, 1.0f) * light.Intensity * light.Color;
+    return (diffusion * surfaceColor + specular) * light.Intensity * light.Color;
 }
 
-float3 PointLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
+float3 PointLightPBR(Light light, float3 normal, float3 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
 {
     // Get out vector for the position of the light
     float3 vectorToLight = normalize(light.Position - worldPos);
@@ -258,10 +258,10 @@ float3 PointLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cam
     // Calculate the attenuation
     float attenuation = Attenuate(light, worldPos);
 
-    return (float4(balancedDiff, 0.0f) * surfaceColor, 0.0f + spec) * attenuation * light.Intensity * light.Color;
+    return (balancedDiff * surfaceColor + spec) * attenuation * light.Intensity * light.Color;
 }
 
-float3 PointLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
+float3 PointLight(Light light, float3 normal, float3 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
 {
     // Get out vector for the position of the light
     float3 vectorToLight = normalize(light.Position - worldPos);
@@ -279,10 +279,10 @@ float3 PointLight(Light light, float3 normal, float4 surfaceColor, float3 camera
     // Get diffusion
     float diffusion = saturate(dot(normal, vectorToLight));
     
-    return (diffusion * surfaceColor + specular, 0.0f) * attenuation * light.Intensity * light.Color;
+    return (diffusion * surfaceColor + specular) * attenuation * light.Intensity * light.Color;
 }
 
-float3 SpotLightPBR(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
+float3 SpotLightPBR(Light light, float3 normal, float3 surfaceColor, float3 cameraPos, float3 worldPos, float roughness, float metalness, float3 specular)
 {
     // Get out vector for the position of the light
     float3 vectorToLight = normalize(light.Position - worldPos);
@@ -301,7 +301,7 @@ float3 SpotLightPBR(Light light, float3 normal, float4 surfaceColor, float3 came
     return PointLightPBR(light, normal, surfaceColor, cameraPos, worldPos, roughness, metalness, specular) * spotTerm;
 }
 
-float3 SpotLight(Light light, float3 normal, float4 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
+float3 SpotLight(Light light, float3 normal, float3 surfaceColor, float3 cameraPos, float3 worldPos, float roughness)
 {
     // Get out vector for the position of the light
     float3 vectorToLight = normalize(light.Position - worldPos);
