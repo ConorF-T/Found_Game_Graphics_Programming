@@ -20,11 +20,13 @@ cbuffer ExternalData : register(b0)
 }
 
 // Texture business
-Texture2D Albedo			: register(t0);
-Texture2D NormalMap			: register(t1);
-Texture2D RoughnessMap		: register(t2);
-Texture2D MetalnessMap		: register(t3);
-SamplerState BasicSampler	: register(s0);
+Texture2D Albedo						: register(t0);
+Texture2D NormalMap						: register(t1);
+Texture2D RoughnessMap					: register(t2);
+Texture2D MetalnessMap					: register(t3);
+Texture2D ShadowMap						: register(t4);
+SamplerState BasicSampler				: register(s0);
+SamplerComparisonState ShadowSampler	: register(s1);
 
 
 // --------------------------------------------------------
@@ -77,6 +79,27 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// because of linear texture sampling, so we lerp the specular color to match
 	float3 specularColor = lerp(F0_NON_METAL, surfaceColor.rgb, metalness);
 
+	// Perform the perspective divide (divide by W) ourselves
+	input.shadowMapPos /= input.shadowMapPos.w;
+
+	// Convert the normalized device coordinates to UVs for sampling
+	float2 shadowUV = input.shadowMapPos.xy * 0.5f + 0.5f;
+	shadowUV.y = 1 - shadowUV.y; // Flip the Y
+
+	// Grab the distances we need: light-to-pixel and closest-surface
+	float distToLight = input.shadowMapPos.z;
+	float distShadowMap = ShadowMap.Sample(BasicSampler, shadowUV).r;
+
+	// Get a ratio of comparison results using SampleCmpLevelZero()
+	float shadowAmount = ShadowMap.SampleCmpLevelZero(
+		ShadowSampler,
+		shadowUV,
+		distToLight).r;
+
+	// For testing, just return black where there are shadows.
+	if (distShadowMap < distToLight)
+		return float4(0, 0, 0, 1);
+
 	// Create our total light
 	float3 totalLight = surfaceColor.rgb;
 
@@ -91,7 +114,11 @@ float4 main(VertexToPixel input) : SV_TARGET
 		switch (l.Type)
 		{
 		case LIGHT_TYPE_DIRECTIONAL:
-			totalLight += DirectionalLightPBR(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
+			float3 lightResult = DirectionalLightPBR(l, input.normal, surfaceColor, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
+			// Apply the shadowing result
+			lightResult *= shadowAmount;
+			// Add this light's result to the total light for this pixel
+			totalLight += lightResult;
 			break;
 
 		case LIGHT_TYPE_POINT:

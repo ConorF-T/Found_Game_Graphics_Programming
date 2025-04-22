@@ -175,7 +175,6 @@
     <FxCompile Include="DebugUVsPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="DecalPixelShader.hlsl" />
     <FxCompile Include="NormalMappingPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
@@ -183,6 +182,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="SkyPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowMapVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DecalPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
@@ -197,28 +202,13 @@
     <Image Include="Assets\Textures\brick_texture.jpg">
       <Filter>Textures</Filter>
     </Image>
-    <Image Include="Assets\Textures\dirt_texture.png">
-      <Filter>Shaders</Filter>
-    </Image>
     <Image Include="Assets\Textures\cobblestone.png">
-      <Filter>Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\cobblestone_normals.png">
       <Filter>Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\cushion.png">
       <Filter>Textures</Filter>
     </Image>
-    <Image Include="Assets\Textures\cushion_normals.png">
-      <Filter>Textures</Filter>
-    </Image>
     <Image Include="Assets\Textures\rock.png">
-      <Filter>Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\rock_normals.png">
-      <Filter>Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\flat_normals.png">
       <Filter>Textures</Filter>
     </Image>
     <Image Include="Assets\Planet\back.png">
@@ -238,6 +228,99 @@
     </Image>
     <Image Include="Assets\Planet\up.png">
       <Filter>Skies</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Roughness\scratched_roughness.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\rock_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Albedos\rough_albedo.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Metal\rough_metal.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\rough_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Roughness\rough_roughness.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Albedos\scratched_albedo.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Metal\scratched_metal.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\scratched_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Albedos\wood_albedo.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Metal\wood_metal.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\wood_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Albedos\paint_albedo.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Metal\paint_metal.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\paint_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Roughness\paint_roughness.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\floor_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Roughness\floor_roughness.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Albedos\floor_albedo.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Metal\floor_metal.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\dirt_texture.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\flat_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\cushion_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Roughness\cobblestone_roughness.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\cobblestone_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Metal\cobblestone_metal.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Albedos\cobblestone_albedo.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Roughness\bronze_roughness.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Normals\bronze_normals.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Metal\bronze_metal.png">
+      <Filter>Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\Albedos\bronze_albedo.png">
+      <Filter>Textures</Filter>
     </Image>
   </ItemGroup>
 </Project>

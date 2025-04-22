@@ -25,17 +25,18 @@ struct VertexShaderInput
 
 struct VertexToPixel
 {
-	// Data type
-	//  |
-	//  |   Name          Semantic
-	//  |    |                |
-	//  v    v                v
+    // Data type
+    //  |
+    //  |   Name          Semantic
+    //  |    |                |
+    //  v    v                v
     float4 screenPosition   : SV_POSITION; // XYZW position (System Value Position)
     float4 color            : COLOR; // RGBA color
     float2 uv               : TEXCOORD; // UV map
     float3 normal           : NORMAL; // normal map
     float3 worldPosition    : POSITION; // world position
     float3 tangent          : TANGENT; // tangent
+    float4 shadowMapPos     : SHADOW_POSITION; // shadow position};
 };
 
 struct VertexToPixel_Sky

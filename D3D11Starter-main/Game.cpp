@@ -118,9 +118,9 @@ void Game::CreateGeometry()
 	XMFLOAT4 black = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Load our shaders
-	std::shared_ptr<SimpleVertexShader> vertexShader = std::make_shared<SimpleVertexShader>(	// Basic Vertex Shader
+	std::shared_ptr<SimpleVertexShader> vertexShader = std::make_shared<SimpleVertexShader>(		// Basic Vertex Shader
 		Graphics::Device, Graphics::Context, FixPath(L"VertexShader.cso").c_str());
-	std::shared_ptr<SimplePixelShader> pixelShader = std::make_shared<SimplePixelShader>(	// Basic Pixel Shader
+	std::shared_ptr<SimplePixelShader> pixelShader = std::make_shared<SimplePixelShader>(			// Basic Pixel Shader
 		Graphics::Device, Graphics::Context, FixPath(L"PixelShader.cso").c_str());
 	std::shared_ptr<SimplePixelShader> uvPixelShader = std::make_shared<SimplePixelShader>(
 		Graphics::Device, Graphics::Context, FixPath(L"DebugUVsPS.cso").c_str());
@@ -128,14 +128,74 @@ void Game::CreateGeometry()
 		Graphics::Device, Graphics::Context, FixPath(L"DebugNormalsPS.cso").c_str());
 	std::shared_ptr<SimplePixelShader> customPixelShader = std::make_shared<SimplePixelShader>(
 		Graphics::Device, Graphics::Context, FixPath(L"CustomPS.cso").c_str());
-	std::shared_ptr<SimplePixelShader> DecalPixelShader = std::make_shared<SimplePixelShader>(	// Shader with 2 layered textures
+	std::shared_ptr<SimplePixelShader> DecalPixelShader = std::make_shared<SimplePixelShader>(		// Shader with 2 layered textures
 		Graphics::Device, Graphics::Context, FixPath(L"DecalPixelShader.cso").c_str());
-	std::shared_ptr<SimplePixelShader> normalMappingPS = std::make_shared<SimplePixelShader>(	// Pixel Shader with normal mapping
+	std::shared_ptr<SimplePixelShader> normalMappingPS = std::make_shared<SimplePixelShader>(		// Pixel Shader with normal mapping
 		Graphics::Device, Graphics::Context, FixPath(L"NormalMappingPS.cso").c_str());
-	std::shared_ptr<SimplePixelShader> skyPixelShader = std::make_shared<SimplePixelShader>(	// Pixel shader for the skybox
+	std::shared_ptr<SimplePixelShader> skyPixelShader = std::make_shared<SimplePixelShader>(		// Pixel shader for the skybox
 		Graphics::Device, Graphics::Context, FixPath(L"SkyPixelShader.cso").c_str());
 	std::shared_ptr<SimpleVertexShader> skyVertexShader = std::make_shared<SimpleVertexShader>(		// Vertex shader for the skybox
 		Graphics::Device, Graphics::Context, FixPath(L"SkyVertexShader.cso").c_str());
+	std::shared_ptr<SimpleVertexShader> shadowVS = std::make_shared<SimpleVertexShader>(			// Vertex shader for shadow mapping
+		Graphics::Device, Graphics::Context, FixPath(L"ShadowMapVS.cso").c_str());
+
+	shadowMapResolution = 1024.0f;
+
+	// Create the actual texture that will be the shadow map
+	D3D11_TEXTURE2D_DESC shadowDesc = {};
+	shadowDesc.Width = shadowMapResolution; // Ideally a power of 2 (like 1024)
+	shadowDesc.Height = shadowMapResolution; // Ideally a power of 2 (like 1024)
+	shadowDesc.ArraySize = 1;
+	shadowDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	shadowDesc.CPUAccessFlags = 0;
+	shadowDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	shadowDesc.MipLevels = 1;
+	shadowDesc.MiscFlags = 0;
+	shadowDesc.SampleDesc.Count = 1;
+	shadowDesc.SampleDesc.Quality = 0;
+	shadowDesc.Usage = D3D11_USAGE_DEFAULT;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> shadowTexture;
+	Graphics::Device->CreateTexture2D(&shadowDesc, 0, shadowTexture.GetAddressOf());
+
+	// Create the depth/stencil view
+	D3D11_DEPTH_STENCIL_VIEW_DESC shadowDSDesc = {};
+	shadowDSDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	shadowDSDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	shadowDSDesc.Texture2D.MipSlice = 0;
+	Graphics::Device->CreateDepthStencilView(
+		shadowTexture.Get(),
+		&shadowDSDesc,
+		shadowDSV.GetAddressOf());
+
+	// Create the SRV for the shadow map
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = 1;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	Graphics::Device->CreateShaderResourceView(
+		shadowTexture.Get(),
+		&srvDesc,
+		shadowSRV.GetAddressOf());
+
+	// Set up the shadow sampler state for comparison
+	D3D11_SAMPLER_DESC shadowSampDesc = {};
+	shadowSampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	shadowSampDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+	shadowSampDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowSampDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowSampDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowSampDesc.BorderColor[0] = 1.0f; // Only need the first component
+	Graphics::Device->CreateSamplerState(&shadowSampDesc, &shadowSampler);
+
+	// Rasterizer state for depth biasing
+	D3D11_RASTERIZER_DESC shadowRastDesc = {};
+	shadowRastDesc.FillMode = D3D11_FILL_SOLID;
+	shadowRastDesc.CullMode = D3D11_CULL_BACK;
+	shadowRastDesc.DepthClipEnable = true;
+	shadowRastDesc.DepthBias = 1000; // Min. precision units, not world units!
+	shadowRastDesc.SlopeScaledDepthBias = 1.0f; // Bias more based on slope
+	Graphics::Device->CreateRasterizerState(&shadowRastDesc, &shadowRasterizer);
 
 	// Load some textures
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> brickSRV;
@@ -267,6 +327,12 @@ void Game::CreateGeometry()
 	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, bronzeMat);
 	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, bronzeMat);
 
+	// Create the floor to test shadows
+	std::shared_ptr<GameEntity> ground = std::make_shared<GameEntity>(cubeMesh, floorMat);
+	ground->GetTransform()->SetScale(100, 100, 100);
+	ground->GetTransform()->SetPosition(0, -105, 0);
+	entities.push_back(ground);
+
 	// Add the entities to the entities list
 	entities.push_back(gameCube);
 	entities.push_back(gameCylinder);
@@ -348,6 +414,21 @@ void Game::CreateGeometry()
 	//lights.push_back(dLight3);
 	lights.push_back(pointLight1);
 	//lights.push_back(spotLight);
+
+	// Create our light view matrix
+	XMVECTOR lightDirection = XMLoadFloat3(&dLight1.Direction);		// Convert our light.direction from a float3 to a xmvector
+	XMMATRIX lightView = XMMatrixLookToLH(
+		-lightDirection * 20, // Position: "Backing up" 20 units from origin
+		lightDirection, // Direction: light's direction
+		XMVectorSet(0, 1, 0, 0)); // Up: World up vector (Y axis)
+
+	// Create our light projection matrix
+	float lightProjectionSize = 15.0f; // Tweak for your scene!
+	XMMATRIX lightProjection = XMMatrixOrthographicLH(
+		lightProjectionSize,
+		lightProjectionSize,
+		1.0f,
+		100.0f);
 
 	// Create our skybox
 	sky = std::make_shared<Sky>(
@@ -677,6 +758,54 @@ void Game::Draw(float deltaTime, float totalTime)
 		Graphics::Context->ClearDepthStencilView(Graphics::DepthBufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
+	//-------------------------------------------------------------
+	// Shadow Mapping
+	//-------------------------------------------------------------
+	// Clear the shadow map
+	Graphics::Context->ClearDepthStencilView(shadowDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	// set up output merger state
+	ID3D11RenderTargetView* nullRTV{};
+	Graphics::Context->OMSetRenderTargets(1, &nullRTV, shadowDSV.Get());
+
+	// Enable the rasterizer state
+	Graphics::Context->RSSetState(shadowRasterizer.Get());
+
+	// Deactivate pixel shader
+	Graphics::Context->PSSetShader(0, 0, 0);
+
+	// Change Viewport
+	D3D11_VIEWPORT viewport = {};
+	viewport.Width = (float)shadowMapResolution;
+	viewport.Height = (float)shadowMapResolution;
+	viewport.MaxDepth = 1.0f;
+	Graphics::Context->RSSetViewports(1, &viewport);
+
+	// Entity render loop
+	shadowVS->SetShader();
+	shadowVS->SetMatrix4x4("view", lightViewMatrix);
+	shadowVS->SetMatrix4x4("projection", lightProjectionMatrix);
+	// Loop and draw all entities
+	for (auto& e : entities)
+	{
+		shadowVS->SetMatrix4x4("world", e->GetTransform()->GetWorldMatrix());
+		shadowVS->CopyAllBufferData();
+		// Draw the mesh directly to avoid the entity's material
+		// Note: Your code may differ significantly here!
+		e->GetMesh()->Draw();
+	}
+
+	viewport.Width = (float)Window::Width();
+	viewport.Height = (float)Window::Height();
+	Graphics::Context->RSSetViewports(1, &viewport);
+	Graphics::Context->OMSetRenderTargets(
+		1,
+		Graphics::BackBufferRTV.GetAddressOf(),
+		Graphics::DepthBufferDSV.Get());
+
+	// Diasable the rasterizer state
+	Graphics::Context->RSSetState(0);
+
 	// holder of which camera is active right now
 	std::shared_ptr<Camera> currentCam;
 
@@ -698,6 +827,8 @@ void Game::Draw(float deltaTime, float totalTime)
 		ps->SetData("lights", &lights[0], sizeof(Light) * (int)lights.size());
 		ps->SetInt("lightCount", (int)lights.size());
 
+		ps->SetShaderResourceView("ShadowMap", shadowSRV);
+		ps->SetSamplerState("ShadowSampler", shadowSampler);
 
 		// Draw the entity
 		e->Draw(currentCam);
@@ -705,6 +836,10 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	// Draw the skybox after everything else
 	sky->Draw(currentCam);
+
+	// Unbind the shadow map at end of frame
+	ID3D11ShaderResourceView* nullSRVs[128] = {};
+	Graphics::Context->PSSetShaderResources(0, 128, nullSRVs);
 
 	// Frame END
 	// - These should happen exactly ONCE PER FRAME

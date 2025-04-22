@@ -61,5 +61,17 @@ private:
 
 	// Sky box
 	std::shared_ptr<Sky> sky;
+
+	// Shadow Mapping reseources
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> shadowDSV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowSRV;
+	DirectX::XMFLOAT4X4 lightViewMatrix;
+	DirectX::XMFLOAT4X4 lightProjectionMatrix;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> shadowRasterizer;
+
+	float shadowMapResolution;
+
+	std::shared_ptr<SimpleVertexShader> shadowVS;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> shadowSampler;
 };
 
