@@ -80,7 +80,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 specularColor = lerp(F0_NON_METAL, surfaceColor.rgb, metalness);
 
 	// Perform the perspective divide (divide by W) ourselves
-	input.shadowMapPos /= input.shadowMapPos.w;
+	input.shadowMapPos.xy /= input.shadowMapPos.w;
 
 	// Convert the normalized device coordinates to UVs for sampling
 	float2 shadowUV = input.shadowMapPos.xy * 0.5f + 0.5f;

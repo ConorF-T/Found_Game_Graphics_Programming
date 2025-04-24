@@ -342,7 +342,7 @@ void Game::CreateGeometry()
 	// Create the floor to test shadows
 	std::shared_ptr<GameEntity> ground = std::make_shared<GameEntity>(cubeMesh, woodMat);
 	ground->GetTransform()->SetScale(25, 25, 25);
-	ground->GetTransform()->SetPosition(0, -32, 0);
+	ground->GetTransform()->SetPosition(0, -28, 15);
 	entities.push_back(ground);
 
 	// Add the entities to the entities list
@@ -363,11 +363,13 @@ void Game::CreateGeometry()
 	}
 
 	// Adjusting the quads and torus to see them better
+	entities[1]->GetTransform()->Rotate(0, -1, 0);
 	entities[4]->GetTransform()->Rotate(-1.0f, 0, 0);
 	entities[5]->GetTransform()->Rotate(1.0f, 0, 0);
 	entities[7]->GetTransform()->Rotate(1.5f, 0, 0);
 
 	// Create the examples for the other shaders
+	/*
 	for (int i = 1; i < 8; i++)
 	{
 		// Create GameEntity with the UV material and the list item's mesh
@@ -381,6 +383,7 @@ void Game::CreateGeometry()
 		// Put both the new entities in the list
 		entities.push_back(gameAlt);
 	}
+	*/
 
 	// Create our Ambient Color
 	ambientColor = XMFLOAT4(0, 0, 0, 1.0f);
@@ -400,7 +403,7 @@ void Game::CreateGeometry()
 
 	Light dLight3 = {};
 	dLight3.Type = LIGHT_TYPE_DIRECTIONAL;
-	dLight3.Direction = XMFLOAT3(0, 0, 1);
+	dLight3.Direction = XMFLOAT3(0, -1, -1);
 	dLight3.Color = XMFLOAT3(1, 1, 1);
 	dLight3.Intensity = 1.0f;
 
@@ -422,8 +425,8 @@ void Game::CreateGeometry()
 	spotLight.SpotOuterAngle = XMConvertToRadians(45.0f);
 
 	lights.push_back(dLight1);
-	lights.push_back(dLight2);
-	lights.push_back(dLight3);
+	//lights.push_back(dLight2);
+	//lights.push_back(dLight3);
 	//lights.push_back(pointLight1);
 	//lights.push_back(spotLight);
 
@@ -511,6 +514,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 	// Bool for showing the demo window
 	bool demoWindow = true;
+
+
 
 	// Begin Custom Window
 	ImGui::Begin("Inspector");
@@ -795,10 +800,20 @@ void Game::Draw(float deltaTime, float totalTime)
 	viewport.MaxDepth = 1.0f;
 	Graphics::Context->RSSetViewports(1, &viewport);
 
+	// holder of which camera is active right now
+	std::shared_ptr<Camera> currentCam;
+
+	// Loop to see which camera is active, if two are active, the latter in the list will be chosen
+	for (int i = 0; i < cameras.size(); i++)
+	{
+		if (cameras[i]->GetActive()) { currentCam = cameras[i]; }
+	}
+
 	// Entity render loop
 	shadowVS->SetShader();
 	shadowVS->SetMatrix4x4("view", lightViewMatrix);
 	shadowVS->SetMatrix4x4("projection", lightProjectionMatrix);
+
 	// Loop and draw all entities
 	for (auto& e : entities)
 	{
@@ -819,15 +834,6 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	// Diasable the rasterizer state
 	Graphics::Context->RSSetState(0);
-
-	// holder of which camera is active right now
-	std::shared_ptr<Camera> currentCam;
-
-	// Loop to see which camera is active, if two are active, the latter in the list will be chosen
-	for (int i = 0; i < cameras.size(); i++)
-	{
-		if (cameras[i]->GetActive()) { currentCam = cameras[i]; }
-	}
 
 	// Draw the geometry
 	// Loop through game entities list to draw each
