@@ -388,13 +388,13 @@ void Game::CreateGeometry()
 	// Create Lights
 	Light dLight1 = {};
 	dLight1.Type = LIGHT_TYPE_DIRECTIONAL;
-	dLight1.Direction = XMFLOAT3(1, 0, 0);
-	dLight1.Color = XMFLOAT3(1, 0, 0);
+	dLight1.Direction = XMFLOAT3(1, -1, 1);
+	dLight1.Color = XMFLOAT3(1, 1, 1);
 	dLight1.Intensity = 1.0f;
 
 	Light dLight2 = {};
 	dLight2.Type = LIGHT_TYPE_DIRECTIONAL;
-	dLight2.Direction = XMFLOAT3(0, 1, 0);
+	dLight2.Direction = XMFLOAT3(0, -1, 1);
 	dLight2.Color = XMFLOAT3(1, 1, 1);
 	dLight2.Intensity = 1.0f;
 
@@ -433,14 +433,16 @@ void Game::CreateGeometry()
 		-lightDirection * 20, // Position: "Backing up" 20 units from origin
 		lightDirection, // Direction: light's direction
 		XMVectorSet(0, 1, 0, 0)); // Up: World up vector (Y axis)
+	XMStoreFloat4x4(&lightViewMatrix, lightView);
 
 	// Create our light projection matrix
-	float lightProjectionSize = 15.0f; // Tweak for your scene!
+	float lightProjectionSize = 30.0f; // Tweak for your scene!
 	XMMATRIX lightProjection = XMMatrixOrthographicLH(
 		lightProjectionSize,
 		lightProjectionSize,
 		1.0f,
 		100.0f);
+	XMStoreFloat4x4(&lightProjectionMatrix, lightProjection);
 
 	// Create our skybox
 	sky = std::make_shared<Sky>(
@@ -835,6 +837,10 @@ void Game::Draw(float deltaTime, float totalTime)
 		e->GetMaterial()->GetPixelShader()->SetFloat4("ambient", ambientColor);
 
 		std::shared_ptr<SimplePixelShader> ps = e->GetMaterial()->GetPixelShader();
+		std::shared_ptr<SimpleVertexShader> vs = e->GetMaterial()->GetVertexShader();
+
+		vs->SetMatrix4x4("lightView", lightViewMatrix);
+		vs->SetMatrix4x4("lightProjection", lightProjectionMatrix);
 
 		ps->SetData("lights", &lights[0], sizeof(Light) * (int)lights.size());
 		ps->SetInt("lightCount", (int)lights.size());
