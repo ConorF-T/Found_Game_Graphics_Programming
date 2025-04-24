@@ -80,7 +80,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 specularColor = lerp(F0_NON_METAL, surfaceColor.rgb, metalness);
 
 	// Perform the perspective divide (divide by W) ourselves
-	input.shadowMapPos /= input.shadowMapPos.w;
+	input.shadowMapPos.xy /= input.shadowMapPos.w;
 
 	// Convert the normalized device coordinates to UVs for sampling
 	float2 shadowUV = input.shadowMapPos.xy * 0.5f + 0.5f;
@@ -96,10 +96,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 		shadowUV,
 		distToLight).r;
 
-	// For testing, just return black where there are shadows.
-	if (distShadowMap < distToLight)
-		return float4(0, 0, 0, 1);
-
 	// Create our total light
 	float3 totalLight = surfaceColor.rgb * ambient;
 
@@ -114,13 +110,11 @@ float4 main(VertexToPixel input) : SV_TARGET
 		switch (l.Type)
 		{
 		case LIGHT_TYPE_DIRECTIONAL:
-			//float3 lightResult = DirectionalLightPBR(l, input.normal, surfaceColor.rgb, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
+			float3 lightResult = DirectionalLightPBR(l, input.normal, surfaceColor.rgb, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
 			// Apply the shadowing result
-			//lightResult *= shadowAmount;
+			lightResult *= shadowAmount;
 			// Add this light's result to the total light for this pixel
-			//totalLight += lightResult;
-
-			totalLight += DirectionalLightPBR(l, input.normal, surfaceColor.rgb, cameraPosition, input.worldPosition, roughness, metalness, specularColor);
+		    totalLight += lightResult;
 			break;
 
 		case LIGHT_TYPE_POINT:
