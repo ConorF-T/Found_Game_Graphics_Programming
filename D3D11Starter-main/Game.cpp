@@ -138,6 +138,12 @@ void Game::CreateGeometry()
 		Graphics::Device, Graphics::Context, FixPath(L"SkyVertexShader.cso").c_str());
 	shadowVS = std::make_shared<SimpleVertexShader>( Graphics::Device, Graphics::Context, FixPath(L"ShadowMapVS.cso").c_str() ); // Vertex shader for shadow mapping
 
+	// Post Processing
+	boxBlurPS = std::make_shared<SimplePixelShader>(		// Pixel shader handling the box blur post processing effect
+		Graphics::Device, Graphics::Context, FixPath(L"BoxBlurPixelShader.cso").c_str());
+	fullscreenVS = std::make_shared<SimpleVertexShader>(
+		Graphics::Device, Graphics::Context, FixPath(L"FullscreenVertexShader.cso").c_str());
+
 	shadowMapResolution = 1024.0f;
 
 	// Create the actual texture that will be the shadow map
@@ -195,6 +201,51 @@ void Game::CreateGeometry()
 	shadowRastDesc.DepthBias = 1000; // Min. precision units, not world units!
 	shadowRastDesc.SlopeScaledDepthBias = 1.0f; // Bias more based on slope
 	Graphics::Device->CreateRasterizerState(&shadowRastDesc, &shadowRasterizer);
+
+	// Sampler state for post processing
+	D3D11_SAMPLER_DESC ppSampDesc = {};
+	ppSampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ppSampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ppSampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ppSampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	ppSampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	Graphics::Device->CreateSamplerState(&ppSampDesc, ppSampler.GetAddressOf());
+
+	// Describe the texture we're creating
+	D3D11_TEXTURE2D_DESC textureDesc = {};
+	textureDesc.Width = Window::Width();
+	textureDesc.Height = Window::Height();
+	textureDesc.ArraySize = 1;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.MipLevels = 1;
+	textureDesc.MiscFlags = 0;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	// Create the resource (no need to track it after the views are created below)
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> ppTexture;
+	Graphics::Device->CreateTexture2D(&textureDesc, 0, ppTexture.GetAddressOf());
+
+	// Create the Render Target View
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+	rtvDesc.Format = textureDesc.Format;
+	rtvDesc.Texture2D.MipSlice = 0;
+	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	Graphics::Device->CreateRenderTargetView(
+		ppTexture.Get(),
+		&rtvDesc,
+		ppRTV.ReleaseAndGetAddressOf());
+
+	// Create the Shader Resource View
+	// By passing it a null description for the SRV, we
+	// get a "default" SRV that has access to the entire resource
+	Graphics::Device->CreateShaderResourceView(
+		ppTexture.Get(),
+		0,
+		ppSRV.ReleaseAndGetAddressOf());
 
 	// Load some textures
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> brickSRV;
@@ -425,8 +476,8 @@ void Game::CreateGeometry()
 	spotLight.SpotOuterAngle = XMConvertToRadians(45.0f);
 
 	lights.push_back(dLight1);
-	//lights.push_back(dLight2);
-	//lights.push_back(dLight3);
+	lights.push_back(dLight2);
+	lights.push_back(dLight3);
 	//lights.push_back(pointLight1);
 	//lights.push_back(spotLight);
 
@@ -777,6 +828,11 @@ void Game::Draw(float deltaTime, float totalTime)
 		Graphics::Context->ClearDepthStencilView(Graphics::DepthBufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
+	// Post Processing Pre-render
+	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	Graphics::Context->ClearRenderTargetView(ppRTV.Get(), clearColor);
+	Graphics::Context->OMSetRenderTargets(1, ppRTV.GetAddressOf(), Graphics::DepthBufferDSV.Get());
+
 	//-------------------------------------------------------------
 	// Shadow Mapping
 	//-------------------------------------------------------------
@@ -827,10 +883,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	viewport.Width = (float)Window::Width();
 	viewport.Height = (float)Window::Height();
 	Graphics::Context->RSSetViewports(1, &viewport);
-	Graphics::Context->OMSetRenderTargets(
-		1,
-		Graphics::BackBufferRTV.GetAddressOf(),
-		Graphics::DepthBufferDSV.Get());
+	Graphics::Context->OMSetRenderTargets(1, Graphics::BackBufferRTV.GetAddressOf(), Graphics::DepthBufferDSV.Get());
 
 	// Diasable the rasterizer state
 	Graphics::Context->RSSetState(0);
@@ -864,6 +917,30 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Unbind the shadow map at end of frame
 	ID3D11ShaderResourceView* nullSRVs[128] = {};
 	Graphics::Context->PSSetShaderResources(0, 128, nullSRVs);
+
+	// -----------------------------------------------------------------------------------
+	// Post Processing Post-draw
+	// -----------------------------------------------------------------------------------
+	// restore the back buffer
+	Graphics::Context->OMSetRenderTargets(1, Graphics::BackBufferRTV.GetAddressOf(), 0);
+
+	// Turn off vertex and index buffers
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	ID3D11Buffer* nothing = 0;
+	Graphics::Context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
+	Graphics::Context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
+
+	// Activate shaders and bind resources
+	// Also set any required cbuffer data (not shown)
+	fullscreenVS->SetShader();
+	boxBlurPS->SetShader();
+	boxBlurPS->SetShaderResourceView("Pixels", ppSRV.Get());
+	boxBlurPS->SetSamplerState("ClampSampler", ppSampler.Get());
+	boxBlurPS->SetInt("blurRadius", blurRadius);
+	boxBlurPS->SetFloat("pixelWidth", 1.0f / Window::Width());
+	boxBlurPS->SetFloat("pixelHeight", 1.0f / Window::Height());
+	Graphics::Context->Draw(3, 0); // Draw exactly 3 vertices (one triangle)
 
 	// Frame END
 	// - These should happen exactly ONCE PER FRAME

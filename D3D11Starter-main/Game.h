@@ -73,5 +73,16 @@ private:
 
 	std::shared_ptr<SimpleVertexShader> shadowVS;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> shadowSampler;
+
+	// Resources that are shared among all post processes
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> ppSampler;
+	std::shared_ptr<SimpleVertexShader> fullscreenVS;
+
+	// Resources that are tied to a particular post process
+	std::shared_ptr<SimplePixelShader> boxBlurPS;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> ppRTV; // For rendering
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ppSRV; // For sampling
+
+	int blurRadius = 100;
 };
 
