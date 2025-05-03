@@ -142,7 +142,7 @@ void Game::CreateGeometry()
 	boxBlurPS = std::make_shared<SimplePixelShader>(		// Pixel shader handling the box blur post processing effect
 		Graphics::Device, Graphics::Context, FixPath(L"BoxBlurPixelShader.cso").c_str());
 	fullscreenVS = std::make_shared<SimpleVertexShader>(
-		Graphics::Device, Graphics::Context, FixPath(L"FullscreenVertexShader.cso").c_str());
+		Graphics::Device, Graphics::Context, FixPath(L"FullscreenVerexShader.cso").c_str());
 
 	shadowMapResolution = 1024.0f;
 
@@ -914,10 +914,6 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Draw the skybox after everything else
 	sky->Draw(currentCam);
 
-	// Unbind the shadow map at end of frame
-	ID3D11ShaderResourceView* nullSRVs[128] = {};
-	Graphics::Context->PSSetShaderResources(0, 128, nullSRVs);
-
 	// -----------------------------------------------------------------------------------
 	// Post Processing Post-draw
 	// -----------------------------------------------------------------------------------
@@ -935,12 +931,17 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Also set any required cbuffer data (not shown)
 	fullscreenVS->SetShader();
 	boxBlurPS->SetShader();
-	boxBlurPS->SetShaderResourceView("Pixels", ppSRV.Get());
-	boxBlurPS->SetSamplerState("ClampSampler", ppSampler.Get());
-	boxBlurPS->SetInt("blurRadius", blurRadius);
 	boxBlurPS->SetFloat("pixelWidth", 1.0f / Window::Width());
 	boxBlurPS->SetFloat("pixelHeight", 1.0f / Window::Height());
+	boxBlurPS->SetInt("blurRadius", blurRadius);
+	boxBlurPS->SetShaderResourceView("Pixels", ppSRV.Get());
+	boxBlurPS->SetSamplerState("ClampSampler", ppSampler.Get());
+
 	Graphics::Context->Draw(3, 0); // Draw exactly 3 vertices (one triangle)
+
+	// Unbind the shadow map at end of frame
+	ID3D11ShaderResourceView* nullSRVs[128] = {};
+	Graphics::Context->PSSetShaderResources(0, 128, nullSRVs);
 
 	// Frame END
 	// - These should happen exactly ONCE PER FRAME
