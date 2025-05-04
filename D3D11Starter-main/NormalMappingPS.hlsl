@@ -10,6 +10,7 @@ cbuffer ExternalData : register(b0)
 
 	// Camera related
 	float3 cameraPosition;
+    float farClip;
 
 	// Lighting related
 	float4 ambient;
@@ -17,6 +18,13 @@ cbuffer ExternalData : register(b0)
 	// Light
 	Light lights[5];
 	int  lightCount;
+	
+	// Fog Stuff
+    int fogType;
+    float3 fogColor;
+    float startFog;
+    float fullFog;
+    float fogDensity;
 }
 
 // Texture business
@@ -97,7 +105,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 		distToLight).r;
 
 	// Create our total light
-	float3 totalLight = surfaceColor.rgb * ambient;
+	float3 totalLight = surfaceColor.rgb * ambient.rgb;
 
 	//  Loop  through all  the lights and calculate the light
 	for (int i = 0; i < lightCount; i++)
@@ -130,6 +138,32 @@ float4 main(VertexToPixel input) : SV_TARGET
 			break;
 		}
 	}
-
-	return float4(pow(totalLight, 1.0f / 2.2f), 1);
+	
+	//--------------------------------------------------------------------------------------------------------------
+	// Fog Stuff
+	//--------------------------------------------------------------------------------------------------------------
+	// Get our surface distance and declare our fog
+    float dist = distance(cameraPosition, input.worldPosition);
+    float fog = 0.0f;
+	
+	// Exponential fog
+    if (fogType == 0)
+    {
+        fog = 1 - exp(-dist * fogDensity);
+    }
+	// Parameterized fog
+    else if (fogType == 1)
+    {
+        fog = smoothstep(startFog, fullFog, dist);
+    }
+	// Linear fog
+    else if (fogType == 2)
+    {
+        fog = dist / farClip;
+    }
+	
+	// Apply our fog to the totalLight
+    totalLight = lerp(totalLight, fogColor, fog);
+	
+    return float4(pow(totalLight, 1.0f / 2.2f), 1);
 }
