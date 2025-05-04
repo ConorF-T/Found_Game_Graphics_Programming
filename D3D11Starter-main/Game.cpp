@@ -771,22 +771,24 @@ void Game::Update(float deltaTime, float totalTime)
 
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Fog"))
+		if (ImGui::TreeNode("Fog")) 
 		{
+			ImGui::ColorEdit3("Fog Color", &fogColor.x);
+
 			// Fog type
-			if (ImGui::RadioButton("Exponential", 0))
+			if (ImGui::RadioButton("Exponential", fogType == 0))
 			{
 				fogType = 0;
 			}
 			ImGui::SameLine();
 
-			if (ImGui::RadioButton("Parameterized", 1))
+			if (ImGui::RadioButton("Parameterized", fogType == 1))
 			{
 				fogType = 1;
 			}
 			ImGui::SameLine();
 
-			if (ImGui::RadioButton("Linear", 2))
+			if (ImGui::RadioButton("Linear", fogType == 2))
 			{
 				fogType = 2;
 			}
