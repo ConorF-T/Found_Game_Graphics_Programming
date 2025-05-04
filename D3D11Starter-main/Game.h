@@ -84,5 +84,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ppSRV; // For sampling
 
 	int blurRadius = 5;
+
+	// Fog resoucres
+	int fogType = 1;
+	DirectX::XMFLOAT3 fogColor = DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f);
+	float startFog = 10.0f;
+	float fullFog = 45.0f;
+	float fogDensity = 0.02f;
 };
 

@@ -785,8 +785,49 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 		if (ImGui::TreeNode("Post Processing"))
 		{
-			// Drag float 
+			// Drag float for blur radius
 			ImGui::DragInt("Blur Radius", &blurRadius, 1);
+
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Fog"))
+		{
+			// Fog type
+			if (ImGui::RadioButton("Exponential", 0))
+			{
+				fogType = 0;
+			}
+			ImGui::SameLine();
+
+			if (ImGui::RadioButton("Parameterized", 1))
+			{
+				fogType = 1;
+			}
+			ImGui::SameLine();
+
+			if (ImGui::RadioButton("Linear", 2))
+			{
+				fogType = 2;
+			}
+
+			// Exponential
+			if (fogType == 0)
+			{
+				ImGui::DragFloat("Density", &fogDensity, 0.001f);
+			}
+
+			// Parameterized
+			if (fogType == 1)
+			{
+				ImGui::DragFloat("Fog Start", &startFog, 1.0f);
+				ImGui::DragFloat("Full Fog", &fullFog, 1.0f);
+			}
+
+			// Parameterized
+			if (fogType == 2)
+			{
+				//ImGui::Text("Camera Far Clip Plane: ", currentCam->GetFarClip());
+			}
 
 			ImGui::TreePop();
 		}
@@ -915,6 +956,14 @@ void Game::Draw(float deltaTime, float totalTime)
 
 		ps->SetShaderResourceView("ShadowMap", shadowSRV);
 		ps->SetSamplerState("ShadowSampler", shadowSampler);
+
+		// Fog business
+		ps->SetInt("fogType", fogType);
+		ps->SetFloat("farClip", currentCam->GetFarClip());
+		ps->SetFloat3("fogColor", fogColor);
+		ps->SetFloat("startFog", startFog);
+		ps->SetFloat("fullFog", fullFog);
+		ps->SetFloat("fogDensity", fogDensity);
 
 		// Draw the entity
 		e->Draw(currentCam);
