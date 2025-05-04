@@ -783,6 +783,13 @@ void Game::Update(float deltaTime, float totalTime)
 			}
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("Post Processing"))
+		{
+			// Drag float 
+			ImGui::DragInt("Blur Radius", &blurRadius, 1);
+
+			ImGui::TreePop();
+		}
 	}
 	ImGui::End(); // Ends the current window
 
@@ -828,10 +835,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		Graphics::Context->ClearDepthStencilView(Graphics::DepthBufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
-	// Post Processing Pre-render
-	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	Graphics::Context->ClearRenderTargetView(ppRTV.Get(), clearColor);
-	Graphics::Context->OMSetRenderTargets(1, ppRTV.GetAddressOf(), Graphics::DepthBufferDSV.Get());
+	
 
 	//-------------------------------------------------------------
 	// Shadow Mapping
@@ -888,6 +892,11 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Diasable the rasterizer state
 	Graphics::Context->RSSetState(0);
 
+	// Post Processing Pre-render
+	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	Graphics::Context->ClearRenderTargetView(ppRTV.Get(), clearColor);
+	Graphics::Context->OMSetRenderTargets(1, ppRTV.GetAddressOf(), Graphics::DepthBufferDSV.Get());
+
 	// Draw the geometry
 	// Loop through game entities list to draw each
 	for (auto& e : entities)
@@ -927,15 +936,21 @@ void Game::Draw(float deltaTime, float totalTime)
 	Graphics::Context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
 	Graphics::Context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 
-	// Activate shaders and bind resources
-	// Also set any required cbuffer data (not shown)
+	// Activate shaders
 	fullscreenVS->SetShader();
 	boxBlurPS->SetShader();
+
+	// cBuffer resources
 	boxBlurPS->SetFloat("pixelWidth", 1.0f / Window::Width());
 	boxBlurPS->SetFloat("pixelHeight", 1.0f / Window::Height());
 	boxBlurPS->SetInt("blurRadius", blurRadius);
+
+	// Binding
 	boxBlurPS->SetShaderResourceView("Pixels", ppSRV.Get());
 	boxBlurPS->SetSamplerState("ClampSampler", ppSampler.Get());
+
+	// Copy data
+	boxBlurPS->CopyAllBufferData();
 
 	Graphics::Context->Draw(3, 0); // Draw exactly 3 vertices (one triangle)
 
