@@ -381,60 +381,41 @@ void Game::CreateGeometry()
 	std::shared_ptr<Mesh> sphereMesh = std::make_shared<Mesh>("Sphere", FixPath("../../Assets/sphere.obj").c_str());
 	std::shared_ptr<Mesh> torusMesh = std::make_shared<Mesh>("Torus", FixPath("../../Assets/torus.obj").c_str());
 
-	// Create the GameEntities
-	std::shared_ptr<GameEntity> gameCube = std::make_shared<GameEntity>(cubeMesh, bronzeMat);
-	std::shared_ptr<GameEntity> gameCylinder = std::make_shared<GameEntity>(cylinderMesh, bronzeMat);
-	std::shared_ptr<GameEntity> gameHelix = std::make_shared<GameEntity>(helixMesh, bronzeMat);
-	std::shared_ptr<GameEntity> gameQuad = std::make_shared<GameEntity>(quadMesh, bronzeMat);
-	std::shared_ptr<GameEntity> gameDubQuad = std::make_shared<GameEntity>(dubQuadMesh, bronzeMat);
-	std::shared_ptr<GameEntity> gameSphere = std::make_shared<GameEntity>(sphereMesh, bronzeMat);
-	std::shared_ptr<GameEntity> gameTorus = std::make_shared<GameEntity>(torusMesh, bronzeMat);
-
 	// Create the floor to test shadows
 	std::shared_ptr<GameEntity> ground = std::make_shared<GameEntity>(cubeMesh, woodMat);
 	ground->GetTransform()->SetScale(25, 25, 25);
 	ground->GetTransform()->SetPosition(0, -28, 15);
 	entities.push_back(ground);
 
-	// Add the entities to the entities list
-	entities.push_back(gameCube);
-	entities.push_back(gameCylinder);
-	entities.push_back(gameHelix);
-	entities.push_back(gameQuad);
-	entities.push_back(gameDubQuad);
-	entities.push_back(gameSphere);
-	entities.push_back(gameTorus);
-
-	// Adjust the transforms
-	float adjust = -9.0f;
-	for (int i = 1; i < entities.size(); i++)
+	// Create the examples for the other shaders
+	for (int i = 1; i < 20; i++)
 	{
-		entities[i]->GetTransform()->MoveAbsolute(adjust, 0.0f, 10.0f);
-		adjust += 3.0f;
-	}
+		// Create GameEntity with the bronze material and the cube mesh
+		std::shared_ptr<Mesh> mesh = cubeMesh;
+		std::shared_ptr<GameEntity> fogEntity = std::make_shared<GameEntity>(mesh, bronzeMat);
 
-	// Adjusting the quads and torus to see them better
-	entities[1]->GetTransform()->Rotate(0, -1, 0);
-	entities[4]->GetTransform()->Rotate(-1.0f, 0, 0);
-	entities[5]->GetTransform()->Rotate(1.0f, 0, 0);
-	entities[7]->GetTransform()->Rotate(1.5f, 0, 0);
+		// Set up its transform to be the same but offset in the z and scale it to be taller
+		fogEntity->GetTransform()->Scale(1.0f, 3.0f, 1.0f);
+		fogEntity->GetTransform()->MoveAbsolute(3.0f, 0, 5.0f * i);
+
+		// Put the new entity in the list
+		entities.push_back(fogEntity);
+	}
 
 	// Create the examples for the other shaders
-	/*
-	for (int i = 1; i < 8; i++)
+	for (int i = 1; i < 20; i++)
 	{
-		// Create GameEntity with the UV material and the list item's mesh
-		std::shared_ptr<Mesh> mesh = entities[i]->GetMesh();
-		std::shared_ptr<GameEntity> gameAlt = std::make_shared<GameEntity>(mesh, floorMat);
+		// Create GameEntity with the bronze material and the cube mesh
+		std::shared_ptr<Mesh> mesh = cubeMesh;
+		std::shared_ptr<GameEntity> fogEntity = std::make_shared<GameEntity>(mesh, bronzeMat);
 
-		// Set up its transform to be the same but offset in the y
-		gameAlt->GetTransform()->MoveAbsolute(entities[i]->GetTransform()->GetPosition());
-		gameAlt->GetTransform()->MoveAbsolute(0, -3.0f, 0);
+		// Set up its transform to be the same but offset in the z and scale it to be taller
+		fogEntity->GetTransform()->Scale(1.0f, 3.0f, 1.0f);
+		fogEntity->GetTransform()->MoveAbsolute(-3.0f, 0, 5.0f * i);
 
-		// Put both the new entities in the list
-		entities.push_back(gameAlt);
+		// Put the new entity in the list
+		entities.push_back(fogEntity);
 	}
-	*/
 
 	// Create our Ambient Color
 	ambientColor = XMFLOAT4(0, 0, 0, 1.0f);

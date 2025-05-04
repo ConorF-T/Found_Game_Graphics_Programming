@@ -149,7 +149,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// Exponential fog
     if (fogType == 0)
     {
-        fog = 1 - exp(-dist * fogDensity);
+        fog = 1.0f - exp(-dist * fogDensity);
     }
 	// Parameterized fog
     else if (fogType == 1)

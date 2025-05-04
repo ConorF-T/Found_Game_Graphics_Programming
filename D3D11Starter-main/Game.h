@@ -83,7 +83,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> ppRTV; // For rendering
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ppSRV; // For sampling
 
-	int blurRadius = 5;
+	int blurRadius = 1;
 
 	// Fog resoucres
 	int fogType = 1;
